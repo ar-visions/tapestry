@@ -1,0 +1,1 @@
+#include <tapestry/object.hpp>
