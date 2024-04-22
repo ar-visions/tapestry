@@ -1,0 +1,2 @@
+# Tapestry
+JSON-like, but tab-indented with operational syntax embedded.  Its a programming language enough to take care of building all sorts of things, including software.  Its a language you would want to actually look at.

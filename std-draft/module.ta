@@ -1,0 +1,5 @@
+# for module
+files '*.cpp':
+src: files
+module.path / 'res': rpath:
+    copy:spinner rpath.select('*'):
