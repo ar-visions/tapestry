@@ -24,10 +24,15 @@ path:
     
     exists:      method
         util.exists src
-
+        return:true # if we return undefined, it may not indent? 
+        return:
+            field:value
+            field2:value
+        
     overlay:     method dest:string
         util.overlay dest src
 
+# this would construct by filling out the undefined elements in defined order
 project:(path this).stem
 
 # 'var' object type is implicit here, but we are essentially using that
@@ -53,9 +58,9 @@ externs.each > e:
 
 folders:util.folders '*'
 folders.each > folder:
-    path:       folder.src
+    src_path:   folder.src
     module:     folder.stem
-    spin path module '$project-$module':  # the result is packed in the method name
+    spin src_path module '$project-$module':  # the result is packed in the method name
         name:       spin.name
         module:     spin.module
         src:        spin.src

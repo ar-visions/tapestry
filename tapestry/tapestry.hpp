@@ -1,1 +1,1 @@
-#include <tapestry/object.hpp>
+#pragma once
