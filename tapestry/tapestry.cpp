@@ -478,7 +478,254 @@ struct Expression:mx {
 
 using namespace ion;
 
+/// we cannot actually move these around so easy without a copy
+/// all ax-classes would need to be contained in pointer containment
+/// we would never actually create anything 'ax' or sub derived without a new keyword, must be stack
+/// if by hack we can enforce this
+
+
+/// we cannot ever put an 'A' class on stack, as we do with mx currently
+/// that could mean, however, mx could be a user of A
+struct A { /// runtime of silver-lang
+    type_t  type;
+    int     refs; /// no schema, since we'll use traditional c++ 17
+    A() : type(null), refs(0) { }
+    A   *hold() { refs++; return this; }
+    void drop() { if (--refs <= 0) delete this; }
+};
+
+struct a_user:A {
+    int a;
+    int b;
+};
+
+template <typename T>
+struct Value:A {
+    T value;
+    Value(const T& v) : value(v) { }
+};
+
+struct string:A {
+    char *chars;
+    int   len;
+    int   alloc;
+    string() : A() {
+        chars = new char[64];
+        alloc = 64;
+        len   = 0;
+        chars[0] = 0;
+    }
+    string(const char *v, int v_len = -1) : A() {
+        len   = v_len == -1 ? strlen(v) : v_len;
+        alloc = 64;
+        while (alloc < len)
+            alloc <<= 1;
+        chars = new char[64];
+        memcpy(chars, v, len);
+        chars[len] = 0;
+    }
+    void append(const char* v, int append_len = -1) {
+        if (append_len == -1)
+            append_len = strlen(v);
+        if (alloc <= len - append_len) {
+            alloc = math::max(128, alloc << 1);
+            char *n = new char[alloc];
+            memcpy(n, chars, len);
+            memcpy(&n[len], &v, append_len);
+            n[len += append_len] = 0;
+            delete[] chars;
+            chars = n;
+        } else {
+            memcpy(&chars[len], v, append_len);
+            chars[len += append_len] = 0;
+        }
+    }
+    void append(char v)                { append(&v, 1); }
+    void append(const string* v)       { append(v->chars, v->len); }
+    void operator += (char          v) { append(&v, 1); }
+    void operator += (const char*   v) { append(v, strlen(v)); }
+    void operator += (const string* v) { append(v->chars, v->len); }
+};
+
+struct m {
+    union {
+        Value<u64>  *v_u64;
+        Value<u32>  *v_u32;
+        Value<u16>  *v_u16;
+        Value<u8>   *v_u8;
+        Value<i64>  *v_i64;
+        Value<i32>  *v_i32;
+        Value<i16>  *v_i16;
+        Value<i8>   *v_i8;
+        Value<bool> *v_bool;
+        string      *a_str;
+        A           *a;
+    };
+    m() : a(null) { }
+    m(u64 i) : v_u64(new Value<u64>(i)) { }
+    m(i64 i) : v_i64(new Value<i64>(i)) { }
+    m(u32 i) : v_u32(new Value<u32>(i)) { }
+    m(i32 i) : v_i32(new Value<i32>(i)) { }
+    m(u16 i) : v_u16(new Value<u16>(i)) { }
+    m(i16 i) : v_i16(new Value<i16>(i)) { }
+    m(u8  i) : v_u8 (new Value<u8 >(i)) { }
+    m(i8  i) : v_i8 (new Value<i8 >(i)) { }
+    m(A  *a) : a(a ? a->hold() : null) { } /// this lets us pass around actual dynamically allocated A classes
+    m(const m& b) : a(b.a ? b.a->hold() : null) { }
+    m& operator=(m &b) {
+        if (a != b.a) {
+            if (a) a->drop();
+            a = b.a->hold();
+        }
+        return *this;
+    }
+   ~m() { if (a) a->drop(); }
+};
+
+struct aitem {
+    struct aitem* next;
+    struct aitem* prev;
+    m element; /// mx is still the intermediate class, since it holds onto and can debug any of the data you give it
+    aitem(const m &e) : element(e) {
+        next = 0;
+        prev = 0;
+    }
+};
+
+struct alist:A {
+    aitem* first;
+    aitem* last;
+    int    count;
+    alist() : A() {
+        first = null;
+        last  = null;
+        count = 0;
+    }
+    template <typename T>
+    alist(std::initializer_list<T> list) : alist() {
+        for (auto i: list)
+            push(i);
+    }
+    void remove(int index, int amount = 1) {
+        int f = 0;
+        bool found = false;
+        for (aitem *i = first; i; i = i->next) {
+            if (index == f++) {
+                aitem *iprev = i->prev;
+                for (int ii = 0; ii < amount; ii++) {
+                    assert(i);
+                    aitem *inext = i->next;
+                    if (inext) inext->prev = iprev;
+                    if (iprev) iprev->next = inext;
+                    delete i;
+                    i = inext;
+                }
+                found = true;
+                break;
+            }
+        }
+        assert(found);
+    }
+    void push(const m &v) {
+        aitem *i = new aitem(v);
+        if (last) {
+            last->next = i;
+            i->prev    = last;
+            last       = i;
+        } else
+            first      = (last = i);
+        count++;
+    }
+    void operator += (const m &v) {
+        push(v);
+    }
+};
+
+struct afield {
+    m key;
+    m value; /// these are more debuggable than simple A* pointers
+    afield() { }
+    afield(const m &k, const m &v) {
+        key   = (m&)k;
+        value = (m&)v;
+    }
+};
+
+struct amap:A {
+
+};
+
+/// it will be nice to make array use A classes ONLY, so we can simplify array
+/// vector will be for primitive types, and we can assert error for A type
+
+/// when A classes are created dynamically, their types will need to be set
+#define decl(U, _A_) \
+struct U { \
+    private: \
+    struct _A_* data; \
+    public: \
+    U(_A_* data) : data((_A_*)((A*)data)->hold()) { ((A*)data)->type = typeof(_A_); } \
+    U(const U &b); \
+    U(); \
+    template <typename T> \
+    U(std::initializer_list<T> list) : data(new _A_(list)) { ((A*)data)->type = typeof(_A_); } \
+    template <typename... Arg> \
+    U(Arg&&... arg) : data(new _A_(std::forward<Arg...>(arg...))) { ((A*)data)->type = typeof(_A_); } \
+    template <typename T> U& operator *= (const T& v) { (*data) *= v; return *this; }\
+    template <typename T> U& operator /= (const T& v) { (*data) /= v; return *this; }\
+    template <typename T> U& operator += (const T& v) { (*data) += v; return *this; }\
+    template <typename T> U& operator -= (const T& v) { (*data) -= v; return *this; }\
+    template <typename T> U  operator *  (const T& v) { return (*data) * v; }\
+    template <typename T> U  operator /  (const T& v) { return (*data) / v; }\
+    template <typename T> U  operator +  (const T& v) { return (*data) + v; }\
+    template <typename T> U  operator -  (const T& v) { return (*data) - v; }\
+    operator m() const; \
+    _A_* operator->() const; \
+    operator _A_*() const; \
+    U &operator=(const U &b); \
+   ~U(); \
+};
+
+#define impl(U, _A_) \
+    U::U(const U &b)      : data((_A_*)b.data->hold()) { } \
+    U::U()                : data(new _A_())  { data->type = typeof(_A_); } \
+    _A_* U::operator->   () const { return data; } \
+         U::operator _A_*() const { return data; } \
+    U   &U::operator=(const U &b) { \
+        if (data != b.data) { \
+            data->drop(); \
+            data = (_A_*)b.data->hold(); \
+        } \
+        return *this; \
+    } \
+    U::operator m() const { return m(data); } \
+    U::~U() { data->drop(); } \
+
+decl(AUser, a_user)
+impl(AUser, a_user)
+
+decl(str2, string)
+impl(str2, string)
+
+decl(List, alist)
+impl(List, alist)
+
+/// positives:
+/// no intern class, no schema
+/// implement meta in one place, on the data
+/// transitionable, once we figure out how to handle 'mx' here
+/// mx would be a user class of a, a class of its own
+/// inside it needs to be able to link to any sort of data, not just primitive
+
 int main(int argc, char **argv) {
+    AUser aclass;
+    aclass->a = 10;
+    aclass->b = 22;
+
+    str2 a = "test"; a += "1";
+
+    List l { str2("test"), str2("2") };
+
     map  def     {{ "source",  path(".") }, { "build", path(".") }, { "project", str("project") }};
     map  args    { map::parse(argc, argv, def) };
     str  project { args["project"] };
