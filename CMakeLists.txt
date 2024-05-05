@@ -7,6 +7,10 @@ project(tapestry)
 file(GLOB_RECURSE mx_src "${CMAKE_CURRENT_SOURCE_DIR}/deps/mx/**/*.cpp")
 
 add_compile_options       (-Wno-write-strings)
+
+add_compile_options       (-fsanitize=address -fno-omit-frame-pointer -g)
+add_link_options          (-fsanitize=address)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
