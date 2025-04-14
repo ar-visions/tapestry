@@ -1,2 +1,13 @@
-build
-deps/*
+.DS_Store
+debug
+release
+bin
+lib
+tokens
+checkout
+*.o
+tapestry
+include
+!include/A
+!include/A-*
+share
