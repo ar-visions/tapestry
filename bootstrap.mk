@@ -15,13 +15,12 @@ BUILD_DIR := $(SRC_ROOT)/debug
 endif
 
 TAPESTRY_BIN := $(TAPESTRY_ROOT)/tapestry
-SRC     ?= $(SRC_ROOT)
 DBG     ?=
 
 .PHONY: all tapestry
 all: $(TAPESTRY_BIN)
 	@echo "==> Building project with tapestry"
-	@SRC=$(SRC) TAPESTRY=$(TAPESTRY) DBG=$(DBG) $(TAPESTRY_BIN) $(TAPESTRY_FILE)
+	TAPESTRY=$(TAPESTRY) DBG=$(DBG) $(TAPESTRY_BIN) $(TAPESTRY_FILE)
 
 $(TAPESTRY_BIN):
 	@echo "==> Bootstrapping tapestry..."

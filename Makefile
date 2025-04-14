@@ -1,4 +1,4 @@
-# tapestry Makefile; this project builds A-type/silver projects and their imports
+# tapestry Makefile; this project builds A-type projects (A-type generates its own headers) and their imports
 CC      = gcc
 PROJECT = tapestry
 CFLAGS := $(CFLAGS) -I. -I./include -I../lib -fPIC \
@@ -10,9 +10,10 @@ TARGET  = tapestry
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) -o tapestry $^ -lm 
+	@mkdir -p bin
+	$(CC) -o bin/tapestry $^ -lm 
 
-A.o: ../lib/A.c
+A.o: ../A/lib/A.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.c
@@ -22,4 +23,4 @@ clean:
 	rm -f $(TARGET) *.o
 
 install:
-	sudo install -m 755 $(TARGET) /usr/local/bin/$(TARGET)
+	@bash install.sh

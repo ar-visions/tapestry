@@ -516,25 +516,23 @@ none tapestry_init(tapestry a) {
 int main(int argc, cstr argv[]) {
     A_start();
     print("running tapestry");
-    cstr  SRC             = getenv("SRC");
     cstr  TAPESTRY        = getenv("TAPESTRY");
     cstr  DBG             = getenv("DBG");
     path  default_path    = form  (path, "%s", ".");
-    path  default_src     = form  (path, "%s", SRC      ? SRC      : "");
     path  default_install = form  (path, "%s", TAPESTRY ? TAPESTRY : ".");
     map   args            = A_args(argc, argv,
         "path",    default_path,
         "install", default_install,
-        "src",     default_src, null);
+        null);
 
     path  path_unrel      = get (args, string("path"));
-    path  src_unrel       = get (args, string("src"));
     path  install_unrel   = get (args, string("install"));
 
     dbg      = DBG ? string(DBG) : string("");
-    src      = absolute(src_unrel);
     install  = absolute(install_unrel);
-    print("install is set to %o", install);
+    src      = parent(install);
+
+    print("install is set to %o, and src for sym-linking is %o", install, src);
     
     include  = form(path, "%o/include", install);
     path loc = absolute(path_unrel);

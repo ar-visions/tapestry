@@ -6,7 +6,7 @@ lib
 tokens
 checkout
 *.o
-tapestry
+./tapestry
 include
 !include/A
 !include/A-*
