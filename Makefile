@@ -1,7 +1,7 @@
 # tapestry Makefile; this project builds A-type projects (A-type generates its own headers) and their imports
 CC      = gcc
 PROJECT = tapestry
-CFLAGS := $(CFLAGS) -I. -I./include -I../lib -fPIC \
+CFLAGS := $(CFLAGS) -I. -I./include -I../A/lib -fPIC \
 	-Wno-incompatible-pointer-types -Wfatal-errors \
 	-std=gnu11 -DMODULE="\"$(PROJECT)\""
 OBJS    = tapestry.o A.o

@@ -5,6 +5,7 @@ bin
 lib
 tokens
 checkout
+libexec
 *.o
 ./tapestry
 include

@@ -11,6 +11,7 @@ forward(tapestry)
     i_prop(X,Y, public, string, commit) \
     i_prop(X,Y, public, path,   import_path) \
     i_prop(X,Y, public, path,   build_path) \
+    i_method(X,Y, public, string, cmake_location) \
     i_method(X,Y, public, bool, make) \
     i_prop(X,Y, public, map,    environment) \
     i_prop(X,Y, public, array, config,   of, string) \
@@ -34,7 +35,7 @@ declare_class(flag)
     i_prop(X,Y, public, path,  build_path) \
     i_prop(X,Y, public, array, imports, of, import) \
     i_prop(X,Y, intern, array, lib_targets) \
-    i_prop(X,Y, intern, array, bin_targets) \
+    i_prop(X,Y, intern, array, app_targets) \
     i_prop(X,Y, public, array, lib,  of, flag) \
     i_prop(X,Y, public, array, app,  of, flag) \
     i_prop(X,Y, public, array, test, of, flag) \
