@@ -3,8 +3,15 @@ PROJECT = tapestry
 CFLAGS := $(CFLAGS) -I. -I./include -I../A/lib -fPIC \
 	-Wno-incompatible-pointer-types -Wfatal-errors \
 	-std=gnu11 -DMODULE="\"$(PROJECT)\""
+ifeq ($(shell uname -s),Darwin)
+	LIB_PRE = lib
+	LIB_EXT = dylib
+else
+	LIB_PRE = lib
+	LIB_EXT = so
+endif
 SHARED_OBJS = tapestry-shared.o A.o
-SHARED_LIB  = lib/libtapestry.so
+SHARED_LIB  = lib/$(LIB_PRE)tapestry.$(LIB_EXT)
 APP_OBJS    = tapestry.o
 TARGET      = bin/tapestry
 
@@ -28,7 +35,7 @@ A.o: ../A/lib/A.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f bin/tapestry lib/libtapestry.* $(SHARED_OBJS) $(APP_OBJS)
+	rm -f $(TARGET) $(SHARED_LIB) $(SHARED_OBJS) $(APP_OBJS)
 
 install:
 	@bash install.sh
