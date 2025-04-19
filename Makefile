@@ -1,17 +1,25 @@
-# tapestry Makefile; this project builds A-type projects (A-type generates its own headers) and their imports
 CC      = gcc
 PROJECT = tapestry
 CFLAGS := $(CFLAGS) -I. -I./include -I../A/lib -fPIC \
 	-Wno-incompatible-pointer-types -Wfatal-errors \
 	-std=gnu11 -DMODULE="\"$(PROJECT)\""
-OBJS    = tapestry.o A.o
-TARGET  = tapestry
+SHARED_OBJS = tapestry-shared.o A.o
+SHARED_LIB  = lib/libtapestry.so
+APP_OBJS    = tapestry.o
+TARGET      = bin/tapestry
 
-all: $(TARGET)
+all: $(SHARED_LIB) $(TARGET)
 
-$(TARGET): $(OBJS)
+tapestry-shared.o: tapestry-shared.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(SHARED_LIB): $(SHARED_OBJS)
+	@mkdir -p lib
+	$(CC) -shared -o $@ $^ -lm
+
+$(TARGET): $(APP_OBJS)
 	@mkdir -p bin
-	$(CC) -o bin/tapestry $^ -lm 
+	$(CC) -o $@ $^ -Llib -ltapestry -lm
 
 A.o: ../A/lib/A.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -20,7 +28,7 @@ A.o: ../A/lib/A.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f bin/tapestry lib/libtapestry.* $(SHARED_OBJS) $(APP_OBJS)
 
 install:
 	@bash install.sh

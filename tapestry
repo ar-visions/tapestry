@@ -17,7 +17,6 @@ forward(tapestry)
     i_prop(X,Y, public, array, config,   of, string) \
     i_prop(X,Y, public, array, commands, of, string) \
     i_override(X,Y, cast, string)
-#define import_intern(X,Y,...) import_schema(X,Y,__VA_ARGS__)
 declare_class(import)
 
 #define flag_schema(X,Y,...) \
@@ -25,12 +24,15 @@ declare_class(import)
     i_prop(X,Y, public, bool,   is_cflag) \
     i_prop(X,Y, public, bool,   is_static) \
     i_override(X,Y, cast, string)
-#define flag_intern(X,Y,...) flag_schema(X,Y,__VA_ARGS__)
 declare_class(flag)
 
 #define tapestry_schema(X,Y,...) \
     i_ctr(X,Y,  public, path) \
     i_prop(X,Y, public, string, name) \
+    i_prop(X,Y, public, path,    src) \
+    i_prop(X,Y, public, path,    install) \
+    i_prop(X,Y, public, path,    include) \
+    i_prop(X,Y, public, string,  dbg) \
     i_prop(X,Y, public, path,  project_path) \
     i_prop(X,Y, public, path,  build_path) \
     i_prop(X,Y, public, array, imports, of, import) \
@@ -39,9 +41,10 @@ declare_class(flag)
     i_prop(X,Y, public, array, lib,  of, flag) \
     i_prop(X,Y, public, array, app,  of, flag) \
     i_prop(X,Y, public, array, test, of, flag) \
+    i_method(X,Y, public, i32, import) \
     i_method(X,Y, public, i32, build) \
+    i_method(X,Y, public, i32, install) \
     i_override(X,Y, method, init)
-#define tapestry_intern(X,Y,...) tapestry_schema(X,Y,__VA_ARGS__)
 declare_class(tapestry)
 
 #endif

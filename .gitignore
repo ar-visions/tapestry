@@ -7,8 +7,9 @@ tokens
 checkout
 libexec
 *.o
-./tapestry
 include
 !include/A
 !include/A-*
+!include/tapestry
+!include/tapestry-*
 share
