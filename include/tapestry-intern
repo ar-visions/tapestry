@@ -1,0 +1,3 @@
+#define import_intern(X,Y,...) import_schema(X,Y,__VA_ARGS__)
+#define flag_intern(X,Y,...) flag_schema(X,Y,__VA_ARGS__)
+#define tapestry_intern(X,Y,...) tapestry_schema(X,Y,__VA_ARGS__)

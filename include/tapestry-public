@@ -1,0 +1,16 @@
+#ifndef _TAPESTRY_PUBLIC_
+#define _TAPESTRY_PUBLIC_
+
+#ifndef tapestry_intern
+#define tapestry_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
+#ifndef import_intern
+#define import_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
+#ifndef flag_intern
+#define flag_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
+
+#include <tapestry>
+#include <tapestry-methods>
+#endif /* _TAPESTRY_PUBLIC_ */

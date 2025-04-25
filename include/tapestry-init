@@ -1,0 +1,3 @@
+#define tapestry(...)   new(tapestry,   __VA_ARGS__)
+#define import(...)     new(import,     __VA_ARGS__)
+#define flag(...)       new(flag,       __VA_ARGS__)

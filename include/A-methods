@@ -1,0 +1,200 @@
+/* generated methods interface */
+#ifndef _A_METHODS_H_
+#define _A_METHODS_H_
+
+#undef init
+#define init(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->init(_i_, ## __VA_ARGS__); })
+#undef dealloc
+#define dealloc(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->dealloc(_i_, ## __VA_ARGS__); })
+#undef compare
+#define compare(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->compare(_i_, ## __VA_ARGS__); })
+#undef hash
+#define hash(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->hash(_i_, ## __VA_ARGS__); })
+#undef copy
+#define copy(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->copy(_i_, ## __VA_ARGS__); })
+#undef data
+#define data(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->data(_i_, ## __VA_ARGS__); })
+#undef data_type
+#define data_type(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->data_type(_i_, ## __VA_ARGS__); })
+#undef data_stride
+#define data_stride(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->data_stride(_i_, ## __VA_ARGS__); })
+#undef pop
+#define pop(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->pop(_i_, ## __VA_ARGS__); })
+#undef push
+#define push(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->push(_i_, ## __VA_ARGS__); })
+#undef insert_after
+#define insert_after(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->insert_after(_i_, ## __VA_ARGS__); })
+#undef index_of
+#define index_of(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->index_of(_i_, ## __VA_ARGS__); })
+#undef item_of
+#define item_of(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->item_of(_i_, ## __VA_ARGS__); })
+#undef sort
+#define sort(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->sort(_i_, ## __VA_ARGS__); })
+#undef remove
+#define remove(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->remove(_i_, ## __VA_ARGS__); })
+#undef remove_item
+#define remove_item(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->remove_item(_i_, ## __VA_ARGS__); })
+#undef get
+#define get(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->get(_i_, ## __VA_ARGS__); })
+#undef count
+#define count(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->count(_i_, ## __VA_ARGS__); })
+#undef append
+#define append(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->append(_i_, ## __VA_ARGS__); })
+#undef write
+#define write(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->write(_i_, ## __VA_ARGS__); })
+#undef file_read
+#define file_read(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->file_read(_i_, ## __VA_ARGS__); })
+#undef gets
+#define gets(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->gets(_i_, ## __VA_ARGS__); })
+#undef file_close
+#define file_close(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->file_close(_i_, ## __VA_ARGS__); })
+#undef total
+#define total(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->total(_i_, ## __VA_ARGS__); })
+#undef concat
+#define concat(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->concat(_i_, ## __VA_ARGS__); })
+#undef get
+#define get(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->get(_i_, ## __VA_ARGS__); })
+#undef set
+#define set(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->set(_i_, ## __VA_ARGS__); })
+#undef push
+#define push(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->push(_i_, ## __VA_ARGS__); })
+#undef slice
+#define slice(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->slice(_i_, ## __VA_ARGS__); })
+#undef realloc
+#define realloc(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->realloc(_i_, ## __VA_ARGS__); })
+#undef resize
+#define resize(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->resize(_i_, ## __VA_ARGS__); })
+#undef len
+#define len(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->len(_i_, ## __VA_ARGS__); })
+#undef invoke
+#define invoke(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->invoke(_i_, ## __VA_ARGS__); })
+#undef first
+#define first(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->first(_i_, ## __VA_ARGS__); })
+#undef last
+#define last(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->last(_i_, ## __VA_ARGS__); })
+#undef pop
+#define pop(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->pop(_i_, ## __VA_ARGS__); })
+#undef fill
+#define fill(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->fill(_i_, ## __VA_ARGS__); })
+#undef reverse
+#define reverse(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->reverse(_i_, ## __VA_ARGS__); })
+#undef remove
+#define remove(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->remove(_i_, ## __VA_ARGS__); })
+#undef remove_weak
+#define remove_weak(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->remove_weak(_i_, ## __VA_ARGS__); })
+#undef push
+#define push(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->push(_i_, ## __VA_ARGS__); })
+#undef push_weak
+#define push_weak(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->push_weak(_i_, ## __VA_ARGS__); })
+#undef clear
+#define clear(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->clear(_i_, ## __VA_ARGS__); })
+#undef concat
+#define concat(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->concat(_i_, ## __VA_ARGS__); })
+#undef get
+#define get(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->get(_i_, ## __VA_ARGS__); })
+#undef count
+#define count(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->count(_i_, ## __VA_ARGS__); })
+#undef len
+#define len(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->len(_i_, ## __VA_ARGS__); })
+#undef index_of
+#define index_of(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->index_of(_i_, ## __VA_ARGS__); })
+#undef remove
+#define remove(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->remove(_i_, ## __VA_ARGS__); })
+#undef set
+#define set(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->set(_i_, ## __VA_ARGS__); })
+#undef get
+#define get(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->get(_i_, ## __VA_ARGS__); })
+#undef fetch
+#define fetch(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->fetch(_i_, ## __VA_ARGS__); })
+#undef lookup
+#define lookup(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->lookup(_i_, ## __VA_ARGS__); })
+#undef contains
+#define contains(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->contains(_i_, ## __VA_ARGS__); })
+#undef set
+#define set(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->set(_i_, ## __VA_ARGS__); })
+#undef fetch
+#define fetch(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->fetch(_i_, ## __VA_ARGS__); })
+#undef rm
+#define rm(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->rm(_i_, ## __VA_ARGS__); })
+#undef contains
+#define contains(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->contains(_i_, ## __VA_ARGS__); })
+#undef concat
+#define concat(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->concat(_i_, ## __VA_ARGS__); })
+#undef len
+#define len(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->len(_i_, ## __VA_ARGS__); })
+#undef call
+#define call(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->call(_i_, ## __VA_ARGS__); })
+#undef len
+#define len(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->len(_i_, ## __VA_ARGS__); })
+#undef ucase
+#define ucase(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->ucase(_i_, ## __VA_ARGS__); })
+#undef lcase
+#define lcase(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->lcase(_i_, ## __VA_ARGS__); })
+#undef split
+#define split(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->split(_i_, ## __VA_ARGS__); })
+#undef escape
+#define escape(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->escape(_i_, ## __VA_ARGS__); })
+#undef index_of
+#define index_of(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->index_of(_i_, ## __VA_ARGS__); })
+#undef append
+#define append(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->append(_i_, ## __VA_ARGS__); })
+#undef append_count
+#define append_count(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->append_count(_i_, ## __VA_ARGS__); })
+#undef push
+#define push(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->push(_i_, ## __VA_ARGS__); })
+#undef concat
+#define concat(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->concat(_i_, ## __VA_ARGS__); })
+#undef trim
+#define trim(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->trim(_i_, ## __VA_ARGS__); })
+#undef mid
+#define mid(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->mid(_i_, ## __VA_ARGS__); })
+#undef reserve
+#define reserve(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->reserve(_i_, ## __VA_ARGS__); })
+#undef write
+#define write(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->write(_i_, ## __VA_ARGS__); })
+#undef ends_with
+#define ends_with(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->ends_with(_i_, ## __VA_ARGS__); })
+#undef starts_with
+#define starts_with(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->starts_with(_i_, ## __VA_ARGS__); })
+#undef cmp
+#define cmp(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->cmp(_i_, ## __VA_ARGS__); })
+#undef eq
+#define eq(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->eq(_i_, ## __VA_ARGS__); })
+#undef exists
+#define exists(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->exists(_i_, ## __VA_ARGS__); })
+#undef make_dir
+#define make_dir(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->make_dir(_i_, ## __VA_ARGS__); })
+#undef is_ext
+#define is_ext(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->is_ext(_i_, ## __VA_ARGS__); })
+#undef is_empty
+#define is_empty(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->is_empty(_i_, ## __VA_ARGS__); })
+#undef is_dir
+#define is_dir(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->is_dir(_i_, ## __VA_ARGS__); })
+#undef cp
+#define cp(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->cp(_i_, ## __VA_ARGS__); })
+#undef directory
+#define directory(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->directory(_i_, ## __VA_ARGS__); })
+#undef cd
+#define cd(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->cd(_i_, ## __VA_ARGS__); })
+#undef stem
+#define stem(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->stem(_i_, ## __VA_ARGS__); })
+#undef ext
+#define ext(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->ext(_i_, ## __VA_ARGS__); })
+#undef filename
+#define filename(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->filename(_i_, ## __VA_ARGS__); })
+#undef absolute
+#define absolute(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->absolute(_i_, ## __VA_ARGS__); })
+#undef parent
+#define parent(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->parent(_i_, ## __VA_ARGS__); })
+#undef read
+#define read(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->read(_i_, ## __VA_ARGS__); })
+#undef change_ext
+#define change_ext(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->change_ext(_i_, ## __VA_ARGS__); })
+#undef ls
+#define ls(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->ls(_i_, ## __VA_ARGS__); })
+#undef move
+#define move(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->move(_i_, ## __VA_ARGS__); })
+#undef modified_time
+#define modified_time(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->modified_time(_i_, ## __VA_ARGS__); })
+
+#endif /* _A_METHODS_H_ */
