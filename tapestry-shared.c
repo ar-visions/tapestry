@@ -10,6 +10,8 @@
 
 #define get_type(T0) T0
 
+path path_ether = null;
+
 #if defined(__x86_64__) || defined(_M_X64)
 static symbol arch = "x86_64";
 #elif defined(__i386__) || defined(_M_IX86)
@@ -37,9 +39,57 @@ static symbol app_ext  = "";
 static symbol platform = "darwin";
 #endif
 
+
+bool is_debug(tapestry t, string name) {
+    string f = form(string, ",%o,", t->dbg);
+    string s = form(string, ",%o,", name);
+    return strstr(f->chars, s->chars) != null;
+}
+
+none import_init(import im) {
+    path   cwd     = path_cwd(4096);
+    path   install = im->tapestry->install;
+    path   src     = im->tapestry->src;
+    bool   debug      = is_debug(im->tapestry, im->name);
+    symbol build_type = debug ? "debug" : "release";
+    path checkout     = form(path, "%o/checkout", install);
+    im->import_path   = form(path, "%o/%o", checkout, im->name);
+    im->build_path    = form(path, "%o/%s", im->import_path, build_type);
+
+    if (!dir_exists("%o/%o", checkout, im->name)) {
+        cd(checkout);
+        if (A_len(src) && dir_exists("%o/%o", src, im->name)) {
+            verify (exec("ln -s %o/%o %o/%o",
+                src, im->name, checkout, im->name) == 0, "symlink");
+        } else {
+            int clone = exec("git clone %o %o --no-checkout && cd %o && git checkout %o && cd ..",
+                im->uri, im->name, im->name, im->commit);
+            verify (clone == 0, "git clone");
+        }
+    }
+    string n = im->name;
+    i32* c = null, *b = null, *i = null;
+    if (file_exists("%o/build", im->import_path)) {
+        path af_remote = form(path, "%o/build", im->import_path);
+        map m_copy = copy(im->tapestry->m);
+        set(m_copy, string("parent"), im->tapestry);
+        set(m_copy, string("path"), af_remote);
+        print("load remote tapestry: %o", n);
+        tapestry t_remote = tapestry(m_copy);
+        im->exports = hold(t_remote->exports);
+        drop(t_remote);
+    }
+    make_dir(im->build_path);
+    cd(im->build_path);
+    make(im);
+    cd(cwd);
+}
+
 string import_cast_string(import a) {
     string config = string(alloc, 128);
     each (a->config, string, conf) {
+        if (starts_with(conf, "-l"))
+            continue;
         if (len(config))
             append(config, " ");
         concat(config, conf);
@@ -62,23 +112,21 @@ string flag_cast_string(flag a) {
     return res;
 }
 
-bool is_debug(tapestry t, string name) {
-    string f = form(string, ",%o,", t->dbg);
-    string s = form(string, ",%o,", name);
-    return strstr(f->chars, s->chars) != null;
-}
-
-none tapestry_with_path(tapestry a, path f) {
-    a->imports      = array(64);
-    a->project_path = directory(f);
-    a->name         = filename(a->project_path);
-    cstr build_dir  = is_debug(a, a->name) ? "debug" : "release";
-    a->build_path   = form(path, "%o/%s", a->project_path, build_dir);
-    a->app          = array(64);
-    a->test               = array(64);
-    a->lib                = array(64);
-    map environment       = map();
-    array  lines          = read(f, typeid(array));
+none tapestry_with_map(tapestry a, map m) {
+    tapestry parent       = get(m, string("parent"));
+    path af               = get(m, string("path"));
+    a->m                  = hold(m);
+    a->dbg                = get(m, string("dbg"));
+    a->install            = get(m, string("install"));
+    a->src                = get(m, string("src"));
+    a->imports            = array(64);
+    a->project_path       = directory(af);
+    a->name               = filename(a->project_path);
+    cstr build_dir        = is_debug(a, a->name) ? "debug" : "release";
+    a->build_path         = form(path, "%o/%s", a->project_path, build_dir);
+    a->exports            = array(64);
+    a->environment        = map();
+    array  lines          = read(af, typeid(array));
     import im             = null;
     string last_arch      = null;
     string last_platform  = null;
@@ -86,12 +134,20 @@ none tapestry_with_path(tapestry a, path f) {
     string top_directive  = null;
     bool   is_import      = true;
     string s_imports      = string(alloc, 64);
+    path   project_lib    = form(path, "%o/lib",  a->project_path);
+    a->has_lib            = dir_exists("%o", project_lib); /// and contains source?
 
     /// for each line, process by indentation level, and evaluate tokens
-    set(environment, string("PROJECT"),      a->name);
-    set(environment, string("PROJECT_PATH"), a->project_path);
-    set(environment, string("BUILD_PATH"),   a->build_path);
-    set(environment, string("IMPORTS"),      s_imports);
+    /// when exports are evaluated by a parent, the environment but reflect their own
+    set(a->environment, string("PROJECT"),      a->name);
+    set(a->environment, string("PROJECT_PATH"), a->project_path);
+    set(a->environment, string("BUILD_PATH"),   a->build_path);
+    set(a->environment, string("IMPORTS"),      s_imports);
+    //set(a->environment, string("DIRECTIVE"),
+    //    (parent ? parent->has_lib : a->has_lib) ? string("lib") :
+    //                string("app"));
+            
+    map environment = parent ? parent->environment : a->environment;
 
     each(lines, line, l) {
         string first = get(l->text, 0);
@@ -102,12 +158,17 @@ none tapestry_with_path(tapestry a, path f) {
             verify(first->chars[flen - 1] == ':', "expected base-directive and ':'");
             last_directive = mid(first, 0, flen - 1);
             verify(cmp(last_directive, "import") == 0 ||
-                   cmp(last_directive, "lib")    == 0 ||
-                   cmp(last_directive, "app")    == 0 ||
-                   cmp(last_directive, "test")   == 0, "expected import or target directive");
+                   cmp(last_directive, "export") == 0, "expected import or export directive");
             is_import = cmp(last_directive, "import") == 0;
             top_directive = copy(last_directive);
-            set(environment, string("DIRECTIVE"), top_directive);
+            /// needs to handle the header generation case where there is a stand-alone app
+            /// for this, the header.sh may handle it
+            /// its very basic, because its simply a fallback header for import
+            /// include <PROJECT> as a public user is all it does
+            set(environment, string("DIRECTIVE"),
+                is_import ? string("lib") : 
+                (parent ? parent->has_lib : a->has_lib) ? string("lib") : // must be based on parent if set
+                            string("app"));
 
         } else if (first->chars[flen - 1] == ':') {
             /// independent of indent, up to user in how to construct
@@ -117,45 +178,46 @@ none tapestry_with_path(tapestry a, path f) {
             else
                 last_arch = n;
         } else if (l->indent == 1) {
-            if (is_import) {
+            if (is_import && !parent) {
                 string name   = evaluate(get(l->text, 0), environment);
                 string uri    = evaluate(get(l->text, 1), environment);
                 string commit = evaluate(get(l->text, 2), environment);
                 if (len(s_imports))
                     append(s_imports, " ");
                 concat(s_imports, name);
-                im = new(import,
+                im = allocate(import,
                     tapestry, a,
                     name,   name,
                     uri,    uri,
                     commit, commit,
                     environment, map(),
-                    config, array(64), commands, array(16));
+                    config, array(64), commands, array(16)); // we must initialize this
+                // we need to create this complete!
                 push(a->imports, im);
                 last_platform = null;
                 last_arch = null;
-            } else {
+            } else if (!is_import) {
+                /// must be export
                 /// we need pre-build scripts too, to generate headers and such
                 array flags =
-                    cmp(top_directive, "lib")  == 0 ? a->lib  :
-                    cmp(top_directive, "app")  == 0 ? a->app  : 
-                    cmp(top_directive, "test") == 0 ? a->test : null;
+                    cmp(top_directive, "export") == 0 ? a->exports : null;
                 verify(flags, "invalid directive: %o", top_directive);
                 each (l->text, string, w) {
-                    pairs(environment, i) {
-                        string name = i->key;
-                        string value = i->value;
-                    }
+                    string directive = get(environment, string("DIRECTIVE"));
                     string t = evaluate(w, environment); // PROJECT is missing null char
                     if (len(t)) {
+                        print("%o: %o", top_directive, t);
+                        bool is_lib    = t->chars[0] == '-' && t->chars[1] == 'l';
                         bool is_cflag  = t->chars[0] == '-';
                         bool is_static = t->chars[0] == '@';
-                        push(flags, flag(name, t,
-                            is_static, is_static, is_cflag, is_cflag));
+                        push(flags, flag(name,
+                                is_static ? mid(t, 1, len(t) - 1) : 
+                                is_lib    ? mid(t, 2, len(t) - 2) : t,
+                            is_static, is_static, is_cflag, is_cflag, is_lib, is_lib));
                     }
                 }
             }
-        } else {
+        } else if (!parent) {
             if ((!last_platform || cmp(last_platform, platform) == 0) &&
                 (!last_arch     || cmp(last_arch,     arch)     == 0)) {
                 if (cmp(first, ">") == 0) {
@@ -182,13 +244,22 @@ none tapestry_with_path(tapestry a, path f) {
                             sz value_ln = len(w) - ln - 1;
                             memcpy(value, &w->chars[ln + 1], value_ln);
                             string n   = trim(string(name));
-                            string val = trim(string(value));
+                            string val = evaluate(string(value), environment);
                             set(im->environment, n, val);
                         } else
                             push(im->config, evaluate(w, environment));
                     }
                 }
             }
+        }
+    }
+
+    if (!path_ether) path_ether = a->project_path;
+
+    if (!parent) {
+        /// this will perform actual import (now that the data is set)
+        each(a->imports, import, im) {
+            A_initialize(im);
         }
     }
 }
@@ -237,8 +308,10 @@ bool import_make(import im) {
         /// clone depot tools if we need it
         if (!strstr(prev, "depot_tools")) {
             if (!dir_exists("%o/depot_tools", src)) {
-                string cmd = form(string, "cd %o && git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git", src);
-                verify(system(cstring(cmd)) == 0, "depot_tools");
+                cd(src);
+                cstr url = "https://chromium.googlesource.com/chromium/tools/depot_tools.git";
+                verify(
+                    exec("git clone %s", url) == 0, "depot_tools");
             }
             /// it may just need to be set in the PATH again, because this wont persist if they user does not have it
             string new_path = form(string, "%o/depot_tools:%o", src, prev);
@@ -247,33 +320,30 @@ bool import_make(import im) {
         cd(im->import_path);
     
         /// now call gclient sync in the project folder
-        verify(system("gclient sync -D") == 0, "gclient");
-        verify(system("python3 tools/git-sync-deps") == 0, "git-sync-deps");
-        string cmd = form(string, "bin/gn gen %s --args='%o'",
-            debug ? "debug" : "release", im, im->config);
-        verify(system(cstring(cmd)) == 0, "gn config");
+        verify(exec("gclient sync -D") == 0, "gclient");
+        verify(exec("python3 tools/git-sync-deps") == 0, "git-sync-deps");
+        verify(exec("bin/gn gen %s --args='%o'",
+            debug ? "debug" : "release", im, im->config) == 0, "gn config");
 
     } else if (file_exists("../Cargo.toml")) {
-        string cmd = form(string, "cargo build --%s --manifest-path ../Cargo.toml --target-dir .",
-            debug ? "debug" : "release"); // todo: copy bin/lib after
-        verify(system(cstring(cmd)) == 0, "rust compilation");
+        // todo: copy bin/lib after
+        verify(exec("cargo build --%s --manifest-path ../Cargo.toml --target-dir .",
+            debug ? "debug" : "release") == 0, "rust compilation");
 
     } else if (cmake_conf || file_exists("../CMakeLists.txt")) {
         /// configure
         if (!file_exists("CMakeCache.txt")) {
             cstr build = debug ? "Debug" : "Release";
-            string cmd = form(string, "cmake -B . -S .. -DCMAKE_INSTALL_PREFIX=%o -DCMAKE_BUILD_TYPE=%s %o", install, build, im);
             //print("configure command: %o", cmd);
-            int  iconf = system(cstring(cmd));
+            int  iconf = exec(
+                "cmake -B . -S .. -DCMAKE_INSTALL_PREFIX=%o -DCMAKE_BUILD_TYPE=%s %o", install, build, im);
             verify(iconf == 0, "%o: configure failed", im->name);
         }
     
         /// build & install
         /// in A-type build we set j to core / 2, unless the repo was large, in which it is set to 4
-        string  cmd = form(string, "%o cmake --build . -j8", env);
-        int    icmd = system(cstring(cmd));
-        string inst = form(string, "%o cmake --install .", env);
-        int   iinst = system(cstring(inst));
+        int    icmd = exec("%o cmake --build . -j8", env);
+        int   iinst = exec("%o cmake --install .",   env);
 
     } else {
         cstr Makefile = "Makefile";
@@ -289,28 +359,25 @@ bool import_make(import im) {
                 }*/
 
                 if (!file_exists("../configure") && file_exists("../configure.ac")) {
-                    verify(system("autoupdate ..")    == 0, "autoupdate");
-                    verify(system("autoreconf -i ..") == 0, "autoreconf");
+                    verify(exec("autoupdate ..")    == 0, "autoupdate");
+                    verify(exec("autoreconf -i ..") == 0, "autoreconf");
                 }
                 /// prefer our pre/generated script configure, fallback to config
                 cstr configure = file_exists("../configure") ? "../configure" : "../config";
                 if (file_exists("%s", configure)) {
-                    string cmd_conf = form(string, "%o %s%s --prefix=%o %o",
+                    verify(exec("%o %s%s --prefix=%o %o",
                         env,
                         configure,
                         debug ? " --enable-debug" : "",
                         install,
-                        im);
-                    //printf("---------------------------\n");
-                    //print("configure: %o", cmd_conf);
-                    //printf("---------------------------\n");
-                    verify(system(cstring(cmd_conf)) == 0, configure);
+                        im) == 0, configure);
                 }
             }
         }
         if (file_exists("%s", Makefile)) {
-            string make = form(string, "%o make -f %s install", env, Makefile);
-            verify(system(cstring(make)) == 0, "%o", make);
+            path cwd = path_cwd(2048);
+            print("cwd = %o", cwd);
+            verify(exec("%o make -f %s install", env, Makefile) == 0, "make");
         }
     }
 
@@ -346,40 +413,6 @@ bool import_make(import im) {
 static bool is_dbg(cstr name) {
     cstr dbg = getenv("DBG");
     return dbg ? strstr(dbg, name) != 0 : false;
-}
-
-i32 tapestry_import(tapestry a) {
-    path install = a->install;
-    /// make checkouts or symlink, then build & install
-    each (a->imports, import, im) {
-        path src = im->tapestry->src;
-        bool   debug      = is_debug(a, im->name);
-        symbol build_type = debug ? "debug" : "release";
-        path checkout     = form(path, "%o/checkout", install);
-        im->import_path   = form(path, "%o/%o", checkout, im->name);
-        im->build_path    = form(path, "%o/%s", im->import_path, build_type);
-
-        if (!dir_exists("%o/%o", checkout, im->name)) {
-            //print("checkout = %o", checkout);
-            cd(checkout);
-            if (A_len(src) && dir_exists("%o/%o", src, im->name)) {
-                string cmd = form(string, "ln -s %o/%o %o/%o",
-                    src, im->name, checkout, im->name);
-                verify (system(cstring(cmd)) == 0, "symlink");
-            } else {
-                //print("cwd = %o", path_cwd(2048));
-                string cmd = form(string, "git clone %o %o --no-checkout && cd %o && git checkout %o && cd ..",
-                    im->uri, im->name, im->name, im->commit);
-                verify (system(cstring(cmd)) == 0, "git clone");
-            }
-        }
-        string n = im->name;
-        i32* c = null, *b = null, *i = null;
-        make_dir(im->build_path);
-        cd(im->build_path);
-        make(im);
-    }
-    return 0;
 }
 
 static array headers(path dir) {
@@ -425,8 +458,11 @@ i32 tapestry_install(tapestry a) {
     }
 
     /// copy all build headers
-    each (build_h, path, f)
-        cp(f, install_inc, false, true);
+    each (build_h, path, f) {
+        string s = filename(f);
+        if (!eq(s, "import"))
+            cp(f, install_inc, false, true);
+    }
 
     /// install libs
     each(a->lib_targets, path, lib) {
@@ -441,13 +477,63 @@ i32 tapestry_install(tapestry a) {
     return 0;
 }
 
-i32 tapestry_build(tapestry a) {
+none cflags_libs(tapestry a, string* cflags, string* libs) {
+    *libs   = string(alloc, 64);
+    *cflags = string(alloc, 64);
+    each (a->imports, import, im) {
+        if (im->exports)
+            each (im->exports, flag, fl) {
+                if (fl->is_cflag) {
+                    concat(*cflags, cast(string, fl));
+                    append(*cflags, " ");
+                } else if (fl->is_lib) {
+                    concat(*libs, form(string, "-l%o", fl->name));
+                    append(*libs, " ");
+                }
+            }
+        
+        /// add each -l under import. these are not what the library links with,
+        /// but what we link to the library with; its better than having two sections, 
+        /// more succinct; no configuration when compiling a library starts with -l)
+        bool has_lib = false;
+        each (im->config, string, conf) {
+            if (starts_with(conf, "-l")) {
+                concat(*libs, conf);
+                append(*libs, " ");
+                has_lib = true;
+            }
+        }
+
+        if (!has_lib) { /// we can assume if no libs are mentioned in import, this project has a lib of its same name; that can be different for resource imports and we may handle it in a succinct way when it arises
+            concat(*libs, form(string, "-l%o", im->name));
+            append(*libs, " ");
+        }
+    }
+}
+
+// build with optional bc path; if no bc path we use the project file system
+i32 tapestry_build(tapestry a, path bc) {
     int  error_code = 0;
     bool debug = is_dbg(cstring(a->name));
+
+    if (bc) {
+        // simplified process for .bc case
+        string name = stem(bc);
+        verify(exec("%o/bin/llc -filetype=obj %o.ll -o %o.o -relocation-model=pic",
+            a->install, name, name) == 0,
+                ".ll -> .o compilation failed");
+        string libs, cflags;
+        cflags_libs(a, &cflags, &libs); // fetches from all exported data
+        verify(exec("%o/bin/clang %o.o -o %o -L %o/lib %o %o",
+            a->install, name, name, a->install, libs, cflags) == 0,
+                "link failed");
+        return 0;
+    }
 
     cd(a->project_path);
     AType type = isa(a->build_path);
     make_dir(a->build_path);
+    path   project_lib  = form(path, "%o/lib",  a->project_path);
     path   build_lib    = form(path, "%o/lib",  a->build_path);
     path   build_app    = form(path, "%o/app",  a->build_path);
     path   build_test   = form(path, "%o/test", a->build_path);
@@ -462,24 +548,40 @@ i32 tapestry_build(tapestry a) {
     path   include      = form(path, "%o/include", a->install);
     a->lib_targets      = array();
     a->app_targets      = array();
+    bool has_lib        = dir_exists("%o", project_lib);
 
-    struct directive {
+    struct dir {
         array list;
         cstr  dir;
+        cstr  output_dir;
         path  build_dir;
-    } directives[3] = {
-        { a->lib,  "lib",  build_lib  },
-        { a->app,  "app",  build_app  },
-        { a->test, "test", build_test }
+    } dirs[3] = {
+        { a->exports, "lib",  "lib",  build_lib  },
+        { a->exports, "app",  "bin",  build_app  },
+        { a->exports, "test", "test", build_test } // not allowed if no lib
     };
-    for (int i = 0; i < sizeof(directives) / sizeof(struct directive); i++) {
-        struct directive* flags = &directives[i];
+
+    for (int i = 0; i < sizeof(dirs) / sizeof(struct dir); i++) {
+        struct dir* flags = &dirs[i];
         bool  is_lib    = strcmp(flags->dir, "lib") == 0;
         path  dir       = form(path, "%o/%s", a->project_path, flags->dir);
         path  lib_src   = form(path, "%o/%s", a->project_path, "lib");
-        path  build_dir = form(path, "%o/%s", a->build_path, flags->dir);
+        path  build_dir = form(path, "%o/%s", a->build_path, flags->output_dir);
+        path  build_dir2 = form(path, "%o/%s", a->build_path, flags->build_dir);
         make_dir(flags->build_dir);
+        make_dir(build_dir);
+        make_dir(build_dir2);
         if (!dir_exists("%o", dir)) continue;
+
+        string base_cflags = string(""), base_libs = string("");
+        /// if its a stand-alone app or has a lib, it should get all of the exports
+        /// also lib gets everything (i == 0)
+        if (has_lib && (i == 0) || !has_lib)
+            cflags_libs(a, &base_cflags, &base_libs);
+        /// app and test depend on its lib
+        if (i != 0)
+            base_libs = form(string, "%o -l%o", base_libs, name);
+
         cd(flags->build_dir);
 
         bool is_app  = (i == 1);
@@ -530,11 +632,12 @@ i32 tapestry_build(tapestry a) {
         for (int l = 0; l < 2; l++) {
             struct lang* lang = &langs[l];
             if (!lang->std) continue;
-            string compiler = form(string, "%s -c %s-std=%s %s %o -I%o -I%o -I%o",
+            string compiler = form(string, "%s -c %s-std=%s %s %o %o -I%o -I%o -I%o -I%o",
                 lang->compiler, debug ? "-g2 " : "", lang->std,
                 l == 0 ? CFLAGS : CXXFLAGS, /// CFLAGS from env come first
+                base_cflags,
                 l == 0 ? cflags : cxxflags, /// ... then project-based flags
-                dir, lib_src, include); /// finally, an explicit -I of our directive
+                flags->build_dir, dir, lib_src, include); /// finally, an explicit -I of our directive
             
             /// for each source file, make objects file names, 
             /// and compile them if they are modified prior to source
@@ -551,9 +654,8 @@ i32 tapestry_build(tapestry a) {
                 /// recompile if newer / includes differ
                 i64 mtime = modified_time(src);
                 if (mtime > modified_time(o_path) || (htime && htime > mtime)) {
-                    string cmd = form(string, "%o -DMODULE=\"\\\"%o\\\"\" %o -o %o", compiler, module_name, src, o_path);
-                    print("compile: %o", cmd);
-                    verify(system(cstring(cmd)) == 0, "compilation");
+                    int compile = exec("%o -DMODULE=\"\\\"%o\\\"\" %o -o %o", compiler, module_name, src, o_path);
+                    verify(compile == 0, "compilation");
                     latest_o = max(latest_o, modified_time(o_path));
                 }
             }
@@ -573,37 +675,29 @@ i32 tapestry_build(tapestry a) {
         if (is_lib) {
             path output_lib = form(path, "%o/lib/%s%o%s", a->build_path, lib_pre, n2, lib_ext);
             if (modified_time(output_lib) < latest_o) {
-                string cmd = form(string, "%s -shared %o %o -o %o",
+                verify (exec("%s -shared %o %o %o -o %o",
                     cpp ? CXX : CC,
-                    lflags, obj, output_lib);
-                print("linking (lib): %o", cmd);
-                verify (system(cstring(cmd)) == 0, "lib");
+                    lflags, base_libs, obj, output_lib) == 0, "linking");
             }
             path lib = form(path, "%o/%s%o%s", flags->build_dir, lib_pre, n2, lib_ext);
             push(a->lib_targets, lib);
         } else {
             each (obj_c, path, obj) {
                 string module_name = stem(obj);
-                path output = form(path, "%o/%s/%o%s", a->build_path, flags->dir, module_name, app_ext);
+                path output = form(path, "%o/%s/%o%s", a->build_path, flags->output_dir, module_name, app_ext);
                 if (modified_time(output) < modified_time(obj)) {
-                    string cmd = form(string, "%s %o %o -o %o",
-                        CC, lflags, obj, output);
-                    char cwd[1024];
-                    getcwd(cwd, sizeof(cwd));
-                    print("linking (c): %o", cmd);
-                    verify (system(cstring(cmd)) == 0, "app");
+                    verify (exec("%s %o %o %o -o %o",
+                        CC, lflags, base_libs, obj, output) == 0, "linking");
                 }
                 if (is_app)
                     push(a->app_targets, output);
             }
             each (obj_cc, path, obj) {
                 string module_name = stem(obj);
-                path output_o = form(path, "%o/%s/%o", a->build_path, flags->dir, module_name);
+                path output_o = form(path, "%o/%s/%o", a->build_path, flags->output_dir, module_name);
                 if (modified_time(output_o) < modified_time(obj)) {
-                    string cmd = form(string, "%s %o %o %o -o %o",
-                        CXX, lflags, obj, output_o);
-                    print("linking (cc): %o", cmd);
-                    verify (system(cstring(cmd)) == 0, "app");
+                    verify (exec("%s %o %o %o -o %o",
+                        CXX, lflags, obj, output_o) == 0, "linking");
                 }
             }
             // run test here, to verify prior to install; will need updated PATH so they may run the apps we built just prior to test

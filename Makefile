@@ -6,9 +6,13 @@ CFLAGS := $(CFLAGS) -I. -I./include -I../A/lib -fPIC \
 ifeq ($(shell uname -s),Darwin)
 	LIB_PRE = lib
 	LIB_EXT = dylib
+	APP_LDFLAGS := -Wl,-rpath,@executable_path/../lib
+	LIB_LDFLAGS := -Wl,-install_name,@rpath/$(LIB_PRE)tapestry.$(LIB_EXT)
 else
 	LIB_PRE = lib
 	LIB_EXT = so
+	APP_LDFLAGS := -Wl,-rpath,'$$ORIGIN/../lib'
+	LIB_LDFLAGS := -Wl,-soname,$(LIB_PRE)tapestry.$(LIB_EXT)
 endif
 SHARED_OBJS = tapestry-shared.o A.o
 SHARED_LIB  = lib/$(LIB_PRE)tapestry.$(LIB_EXT)
@@ -22,11 +26,11 @@ tapestry-shared.o: tapestry-shared.c
 
 $(SHARED_LIB): $(SHARED_OBJS)
 	@mkdir -p lib
-	$(CC) -shared -o $@ $^ -lm
+	$(CC) -shared -o $@ $^ -lm $(LIB_LDFLAGS)
 
 $(TARGET): $(APP_OBJS)
 	@mkdir -p bin
-	$(CC) -o $@ $^ -Llib -ltapestry -lm
+	$(CC) -o $@ $^ -Llib -lm $(APP_LDFLAGS) -ltapestry 
 
 A.o: ../A/lib/A.c
 	$(CC) $(CFLAGS) -c $< -o $@

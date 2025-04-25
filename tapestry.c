@@ -6,8 +6,24 @@
 #include <tapestry-methods>
 #include <A-init>
 
+#include <signal.h>
+#include <unistd.h>
+
+void on_signal(int sig) {
+    pid_t pid = A_last_pid();
+    printf("\ntapestry: signal %i\n", sig);
+    if (pid > 0)
+        killpg(pid, SIGTERM);
+    exit(1);
+}
+
 int main(int argc, cstr argv[]) {
     A_start();
+
+    signal(SIGINT,  on_signal);  // ctrl+c
+    signal(SIGTERM, on_signal);  // kill
+    signal(SIGHUP,  on_signal);  // terminal closed
+
     cstr  _TAPESTRY       = getenv("TAPESTRY");
     cstr  _DBG            = getenv("DBG");
     path  default_path    = form  (path, "%s", ".");
@@ -45,15 +61,16 @@ int main(int argc, cstr argv[]) {
         fault("tapestry: cannot build from path[ %o ]", loc);
     
     path     af = absolute(f);
-    tapestry t  = tapestry(af);
-
-    t->dbg      = _DBG ? string(_DBG) : string("");
-    t->install  = absolute(install_unrel);
-    t->src      = parent(install);
+    map      m  = map_of(
+        "path",    af,
+        "dbg",     _DBG ? string(_DBG) : string(""),
+        "install", absolute(install_unrel),
+        "src",     parent(install));
+    tapestry t  = tapestry(m);
     
-    i32 import_code  = import (t); if (import_code  != 0) return import_code;
-    i32 build_code   = build  (t); if (build_code   != 0) return build_code;
-    i32 install_code = install(t); if (install_code != 0) return install_code;
+  //i32 import_code  = import (t);       if (import_code  != 0) return import_code;
+    i32 build_code   = build  (t, null); if (build_code   != 0) return build_code;
+    i32 install_code = install(t);       if (install_code != 0) return install_code;
     print("success");
     return 0;
 }
