@@ -40,6 +40,8 @@ static symbol platform = "darwin";
 #endif
 
 
+none import_sync_tokens(import im);
+
 bool is_debug(tapestry t, string name) {
     string f = form(string, ",%o,", t->dbg);
     string s = form(string, ",%o,", name);
@@ -62,6 +64,7 @@ none import_init(import im) {
             verify (exec("ln -s %o/%o %o/%o",
                 src, im->name, checkout, im->name) == 0, "symlink");
         } else {
+            exec("rm -rf %o", im->name);
             int clone = exec("git clone %o %o --no-checkout && cd %o && git checkout %o && cd ..",
                 im->uri, im->name, im->name, im->commit);
             verify (clone == 0, "git clone");
@@ -74,7 +77,6 @@ none import_init(import im) {
         map m_copy = copy(im->tapestry->m);
         set(m_copy, string("parent"), im->tapestry);
         set(m_copy, string("path"), af_remote);
-        print("load remote tapestry: %o", n);
         tapestry t_remote = tapestry(m_copy);
         im->exports = hold(t_remote->exports);
         drop(t_remote);
@@ -88,6 +90,7 @@ none import_init(import im) {
         print("> %o: command: %o", im->name, cmd);
         verify(exec("%o", evaluate(cmd, im->tapestry->environment)) == 0, "expected successful command post-install");
     }
+    import_sync_tokens(im);
     cd(cwd);
 }
 
@@ -293,11 +296,32 @@ string import_cmake_location(import im) {
     return null;
 }
 
+none import_sync_tokens(import im) {
+    path t0 = form(path, "tapestry-token");
+    path t1 = form(path, "%o/tokens/%o", im->tapestry->install, im->name);
+    struct stat build_token, installed_token;
+    /// create tokens to indicate no errors during config/build/install
+    /// we place two: one in the build folder and one in the tokens folder
+    /// their modified timestamps must match, and their files must be newer
+    /// than anything in the build folder
+    cstr both[2] = { cstring(t0), cstring(t1) };
+    for (int i = 0; i < 2; i++) {
+        FILE* ftoken = fopen(both[i], "wb");
+        fwrite("im-a-token", 10, 1, ftoken);
+        fclose(ftoken);
+    }
+    int istat_build   = stat(cstring(t0), &build_token);
+    int istat_install = stat(cstring(t1), &installed_token);
+    struct utimbuf times;
+    times.actime  = build_token.st_atime;  // access time
+    times.modtime = build_token.st_mtime;  // modification time
+    utime(cstring(t1), &times);
+}
+
 /// handle autoconfig (if present) and resultant / static Makefile
 bool import_make(import im) {
     path install = im->tapestry->install;
     i64 conf_status = INT64_MIN;
-    struct stat build_token, installed_token;
     bool debug      = is_debug(im->tapestry, im->name);
     path t0 = form(path, "tapestry-token");
     path t1 = form(path, "%o/tokens/%o", install, im->name);
@@ -327,7 +351,7 @@ bool import_make(import im) {
 
     if (conf_status == 0) {
         clear(im->commands);
-        print("%o: build-cache", im->name);
+        print("%22o: build-cache", im->name);
         return true;
     }
 
@@ -372,7 +396,6 @@ bool import_make(import im) {
         /// configure
         if (!file_exists("CMakeCache.txt")) {
             cstr build = debug ? "Debug" : "Release";
-            //print("configure command: %o", cmd);
             int  iconf = exec(
                 "cmake -B . -S .. -DCMAKE_INSTALL_PREFIX=%o -DCMAKE_BUILD_TYPE=%s %o", install, build, im);
             verify(iconf == 0, "%o: configure failed", im->name);
@@ -388,14 +411,6 @@ bool import_make(import im) {
         if (!file_exists("Makefile")) {
             if (file_exists("../configure.ac") || file_exists("../configure") || file_exists("../config")) {
                 /// generate configuration scripts if available
-                
-                /*
-                pairs(im->environment, i) {
-                    string name = i->key;
-                    string value = i->value;
-                    print("env[%o] = %o", name, value);
-                }*/
-
                 if (!file_exists("../configure") && file_exists("../configure.ac")) {
                     verify(exec("autoupdate ..")    == 0, "autoupdate");
                     verify(exec("autoreconf -i ..") == 0, "autoreconf");
@@ -419,32 +434,15 @@ bool import_make(import im) {
         }
     }
 
-    cd(im->build_path);
+    /*cd(im->build_path);
     if (dir_exists("share")) {
         /// copy this to our build folder, we must accumulate 'share' resources into our own
         /// when we package apps, this accumulation of share is desired
         /// its not a practical thing to crawl-through multiple overlapping projects that exist in different folders
         path from = form(path, "share");
-        path to   = form(path, "%o/share", im->tapestry->build_path);
+        path to   = form(path, "%o/share/%o", im->tapestry->install, im->name);
         cp(from, to, true, true);
-    }
-
-    /// create tokens to indicate no errors during config/build/install
-    /// we place two: one in the build folder and one in the tokens folder
-    /// their modified timestamps must match, and their files must be newer
-    /// than anything in the build folder
-    cstr both[2] = { cstring(t0), cstring(t1) };
-    for (int i = 0; i < 2; i++) {
-        FILE* ftoken = fopen(both[i], "wb");
-        fwrite("im-a-token", 10, 1, ftoken);
-        fclose(ftoken);
-    }
-    int istat_build   = stat(cstring(t0), &build_token);
-    int istat_install = stat(cstring(t1), &installed_token);
-    struct utimbuf times;
-    times.actime  = build_token.st_atime;  // access time
-    times.modtime = build_token.st_mtime;  // modification time
-    utime(cstring(t1), &times);
+    }*/
     return true;
 }
 
@@ -492,25 +490,25 @@ i32 tapestry_install(tapestry a) {
     each(project_h, path, f) {
         if (filename_index(build_h, f) >= 0)
             continue;
-        cp(f, install_inc, false, true);
+        exec("rsync -a %o %o/%o/", f, install_inc);
     }
 
     /// copy all build headers
     each (build_h, path, f) {
         string s = filename(f);
         if (!eq(s, "import"))
-            cp(f, install_inc, false, true);
+            exec("rsync -a %o %o/", f, install_inc);
     }
 
     /// install libs
     each(a->lib_targets, path, lib) {
         path f_lib = filename(lib);
-        cp(lib, form(path, "%o/%o", install_lib, f_lib), false, true);
+        exec("rsync -a %o %o/%o", lib, install_lib, f_lib);
     }
     /// install apps
     each(a->app_targets, path, app) {
         path f_app = filename(app);
-        cp(app, form(path, "%o/%o", install_app, f_app), false, true);
+        exec("rsync -a %o %o/%o", app, install_app, f_app);
     }
 
     return 0;
@@ -523,7 +521,7 @@ none cflags_libs(tapestry a, string* cflags, string* libs) {
     array lists[2] = { a->interns, a->exports };
     for (int i = 0; i < 2; i++)
         each (lists[i], flag, fl) {
-            print("flag = %o", fl->name);
+            print("%o: %o", a->name, fl->name);
             if (fl->is_cflag) {
                 concat(*cflags, cast(string, fl));
                 append(*cflags, " ");
@@ -701,7 +699,9 @@ i32 tapestry_build(tapestry a, path bc) {
 
                 /// recompile if newer / includes differ
                 i64 mtime = modified_time(src);
-                if (mtime > modified_time(o_path) || (htime && htime > mtime)) {
+                bool source_newer  = mtime > modified_time(o_path);
+                bool header_change = htime && htime > modified_time(o_path);
+                if (source_newer || header_change) {
                     int compile = exec("%o -DMODULE=\"\\\"%o\\\"\" %o -o %o", compiler, module_name, src, o_path);
                     verify(compile == 0, "compilation");
                     latest_o = max(latest_o, modified_time(o_path));
@@ -714,16 +714,16 @@ i32 tapestry_build(tapestry a, path bc) {
         //concat(lflags, form(string, "-L%o/lib ", a->build_path));
         concat(lflags, form(string, "-L%o/lib -Wl,-rpath,%o/lib", a->install, a->install));
 
+
         if (is_lib) {
             path output_lib = form(path, "%o/lib/%s%o%s", a->build_path, lib_pre, n2, lib_ext);
             path install_lib = form(path, "%o/lib/%s%o%s", a->install, lib_pre, n2, lib_ext);
-            //if (!latest_o || (modified_time(output_lib) < latest_o || (modified_time(install_lib) < latest_o))) {
+            if (!latest_o || (modified_time(install_lib) < latest_o)) {
                 verify (exec("%s -shared %o %o %o -o %o",
                     cpp ? CXX : CC,
                     lflags, base_libs, obj, output_lib) == 0, "linking");
-            //}
-            path lib = form(path, "%o/%s%o%s", flags->build_dir, lib_pre, n2, lib_ext);
-            push(a->lib_targets, lib);
+            }
+            push(a->lib_targets, output_lib);
         } else {
             each (obj_c, path, obj) {
                 string module_name = stem(obj);
@@ -746,6 +746,21 @@ i32 tapestry_build(tapestry a, path bc) {
             // run test here, to verify prior to install; will need updated PATH so they may run the apps we built just prior to test
         }
     }
+    
+    each (a->imports, import, im) {
+        if (!dir_exists("%o/share", im->import_path))
+            continue;
+        verify (exec("rsync -a %o/share/ %o/share/%o",
+            im->import_path, a->install, a->name) == 0,
+                "import resources");
+    }
+
+    /// an app could perhaps initialize its own installation in a post-install -- fetching resources etc
+    if (dir_exists("%o/share", a->project_path)) {
+        verify (exec("rsync -a %o/share %o/share/%o", a->project_path, a->install, a->name) == 0,
+            "project resources");
+    }
+
     return error_code;
 }
 

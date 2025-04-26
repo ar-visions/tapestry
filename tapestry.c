@@ -15,7 +15,7 @@ void on_signal(int sig) {
     if (pid > 0)
         killpg(pid, SIGTERM);
     exit(1);
-}
+} 
 
 int main(int argc, cstr argv[]) {
     A_start();
