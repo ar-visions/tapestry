@@ -24,6 +24,7 @@ int main(int argc, cstr argv[]) {
     signal(SIGTERM, on_signal);  // kill
     signal(SIGHUP,  on_signal);  // terminal closed
 
+    setenv("VERBOSE", "1", true);
     cstr  _TAPESTRY       = getenv("TAPESTRY");
     cstr  _DBG            = getenv("DBG");
     path  default_path    = form  (path, "%s", ".");

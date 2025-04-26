@@ -43,6 +43,7 @@ declare_class(flag)
     i_prop(X,Y, intern, array, lib_targets) \
     i_prop(X,Y, intern, array, app_targets) \
     i_prop(X,Y, public, array, exports, of, flag) \
+    i_prop(X,Y, public, array, interns, of, flag) \
     i_prop(X,Y, intern, map,   environment) \
     i_prop(X,Y, intern, bool,  has_lib) \
     i_method(X,Y, public, i32, build, path) \

@@ -194,6 +194,8 @@
 #define ls(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->ls(_i_, ## __VA_ARGS__); })
 #undef move
 #define move(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->move(_i_, ## __VA_ARGS__); })
+#undef latest_modified
+#define latest_modified(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->latest_modified(_i_, ## __VA_ARGS__); })
 #undef modified_time
 #define modified_time(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->modified_time(_i_, ## __VA_ARGS__); })
 
