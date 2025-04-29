@@ -17,6 +17,7 @@ forward(tapestry)
     i_prop(X,Y, public, map,    environment) \
     i_prop(X,Y, public, array, config,   of, string) \
     i_prop(X,Y, public, array, commands, of, string) \
+    i_prop(X,Y, public, array, always,   of, string) \
     i_override(X,Y, cast, string) \
     i_override(X,Y, method, init)
 declare_class(import)

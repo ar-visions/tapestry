@@ -8,10 +8,6 @@
 #include <sys/stat.h>
 #include <utime.h>
 
-#define get_type(T0) T0
-
-path path_ether = null;
-
 #if defined(__x86_64__) || defined(_M_X64)
 static symbol arch = "x86_64";
 #elif defined(__i386__) || defined(_M_IX86)
@@ -23,22 +19,12 @@ static symbol arch = "arm32";
 #endif
 
 #if defined(__linux__)
-static symbol lib_pre  = "lib";
-static symbol lib_ext  = ".so";
-static symbol app_ext  = "";
-static symbol platform = "linux";
+static symbol lib_pre  = "lib"; static symbol lib_ext  = ".so";     static symbol app_ext  = "";        static symbol platform = "linux";
 #elif defined(_WIN32)
-static symbol lib_pre  = "";
-static symbol lib_ext  = ".dll";
-static symbol app_ext  = ".exe";
-static symbol platform = "windows";
+static symbol lib_pre  = "";    static symbol lib_ext  = ".dll";    static symbol app_ext  = ".exe";    static symbol platform = "windows";
 #elif defined(__APPLE__)
-static symbol lib_pre  = "lib";
-static symbol lib_ext  = ".dylib";
-static symbol app_ext  = "";
-static symbol platform = "darwin";
+static symbol lib_pre  = "lib"; static symbol lib_ext  = ".dylib";  static symbol app_ext  = "";        static symbol platform = "darwin";
 #endif
-
 
 none import_sync_tokens(import im);
 
@@ -68,6 +54,11 @@ none import_init(import im) {
             int clone = exec("git clone %o %o --no-checkout && cd %o && git checkout %o && cd ..",
                 im->uri, im->name, im->name, im->commit);
             verify (clone == 0, "git clone");
+            if (file_exists("%o/diff/%o.patch", im->tapestry->project_path, im->name)) {
+                cd(im->import_path);
+                verify(exec("git apply %o/diff/%o.patch", im->tapestry->project_path, im->name) == 0, "patch");
+                cd(checkout);
+            }
         }
     }
     string n = im->name;
@@ -89,6 +80,10 @@ none import_init(import im) {
     each(im->commands, string, cmd) {
         print("> %o: command: %o", im->name, cmd);
         verify(exec("%o", evaluate(cmd, im->tapestry->environment)) == 0, "expected successful command post-install");
+    }
+    each(im->always, string, cmd) {
+        print("! %o: command: %o", im->name, cmd);
+        verify(exec("%o", evaluate(cmd, im->tapestry->environment)) == 0, "expected successful ! inline command");
     }
     import_sync_tokens(im);
     cd(cwd);
@@ -170,10 +165,7 @@ none tapestry_with_map(tapestry a, map m) {
     set(a->environment, string("PROJECT_PATH"), a->project_path);
     set(a->environment, string("BUILD_PATH"),   a->build_path);
     set(a->environment, string("IMPORTS"),      s_imports);
-    //set(a->environment, string("DIRECTIVE"),
-    //    (parent ? parent->has_lib : a->has_lib) ? string("lib") :
-    //                string("app"));
-            
+     
     map environment = parent ? parent->environment : a->environment;
 
     each(lines, line, l) {
@@ -188,10 +180,6 @@ none tapestry_with_map(tapestry a, map m) {
                    cmp(last_directive, "export") == 0, "expected import or export directive");
             is_import = cmp(last_directive, "import") == 0;
             top_directive = copy(last_directive);
-            /// needs to handle the header generation case where there is a stand-alone app
-            /// for this, the header.sh may handle it
-            /// its very basic, because its simply a fallback header for import
-            /// include <PROJECT> as a public user is all it does
             set(environment, string("DIRECTIVE"),
                 is_import ? string("lib") : 
                 (parent ? parent->has_lib : a->has_lib) ? string("lib") : // must be based on parent if set
@@ -225,7 +213,7 @@ none tapestry_with_map(tapestry a, map m) {
                         uri,    uri,
                         commit, commit,
                         environment, map(),
-                        config, array(64), commands, array(16)); // we must initialize this
+                        config, array(64), commands, array(16), always, array(16)); // we must initialize this
                     // we need to create this complete!
                     push(a->imports, im);
                 }
@@ -238,16 +226,17 @@ none tapestry_with_map(tapestry a, map m) {
         } else if (!parent) {
             if ((!last_platform || cmp(last_platform, platform) == 0) &&
                 (!last_arch     || cmp(last_arch,     arch)     == 0)) {
-                if (cmp(first, ">") == 0) {
+                bool use_command = cmp(first, ">") == 0;
+                if (use_command || cmp(first, "!") == 0) {
                     // combine tokens into singular string
                     string cmd = string(alloc, 64);
                     each(l->text, string, w) {
                         if (first == w) continue;
                         if (len(cmd))
                             append(cmd, " ");
-                        concat(cmd, evaluate(w, environment));
+                        concat(cmd, w);
                     }
-                    push(im->commands, cmd);
+                    push(use_command ? im->commands : im->always, cmd);
                 } else {
                     each(l->text, string, w) {
                         /// if its VAR=VAL then this is not 'config' but rather environment
@@ -275,8 +264,6 @@ none tapestry_with_map(tapestry a, map m) {
         }
     }
 
-    if (!path_ether) path_ether = a->project_path;
-
     if (!parent) {
         /// this will perform actual import (now that the data is set)
         each(a->imports, import, im) {
@@ -300,10 +287,7 @@ none import_sync_tokens(import im) {
     path t0 = form(path, "tapestry-token");
     path t1 = form(path, "%o/tokens/%o", im->tapestry->install, im->name);
     struct stat build_token, installed_token;
-    /// create tokens to indicate no errors during config/build/install
-    /// we place two: one in the build folder and one in the tokens folder
-    /// their modified timestamps must match, and their files must be newer
-    /// than anything in the build folder
+    /// create token pair (build & install) to indicate no errors during config/build/install
     cstr both[2] = { cstring(t0), cstring(t1) };
     for (int i = 0; i < 2; i++) {
         FILE* ftoken = fopen(both[i], "wb");
@@ -325,6 +309,7 @@ bool import_make(import im) {
     bool debug      = is_debug(im->tapestry, im->name);
     path t0 = form(path, "tapestry-token");
     path t1 = form(path, "%o/tokens/%o", install, im->name);
+    path checkout = form(path, "%o/checkout", install);
 
     make_dir(im->build_path);
     cd(im->build_path);
@@ -356,42 +341,15 @@ bool import_make(import im) {
     }
 
     string cmake_conf = cmake_location(im);
+    string args = cast(string, im);
+    cstr debug_r = debug ? "debug" : "release";
+    setenv("BUILD_CONFIG", args->chars, 1);
+    setenv("BUILD_TYPE", debug_r, 1);
 
-    /// GN support
-    if (file_exists("../DEPS")) {
-        cstr   prev = getenv("PATH");
-        path src = im->tapestry->src;
-        /// clone depot tools if we need it
-        if (!strstr(prev, "depot_tools")) {
-            if (!dir_exists("%o/depot_tools", src)) {
-                cd(src);
-                cstr url = "https://chromium.googlesource.com/chromium/tools/depot_tools.git";
-                verify(
-                    exec("git clone %s", url) == 0, "depot_tools");
-            }
-            /// it may just need to be set in the PATH again, because this wont persist if they user does not have it
-            string new_path = form(string, "%o/depot_tools:%s", src, prev);
-            setenv("PATH", cstring(new_path), 1);
-        }
-        cd(im->import_path);
-    
-        /// now call gclient sync in the project folder
-        verify(exec("gclient sync -D") == 0, "gclient");
-        verify(exec("python3 tools/git-sync-deps") == 0, "git-sync-deps");
-        string args = cast(string, im->config);
-        cstr debug_r = debug ? "debug" : "release";
-        verify(exec("bin/gn gen %s --args='%o'",
-            debug_r, im, args) == 0, "gn config");
-        cd(im->import_path);
-        int icmd = exec("ninja -C %s", debug_r);
-        cd(im->build_path);
-        verify(icmd == 0, "ninja compilation");
-
-    } else if (file_exists("../Cargo.toml")) {
+    if (file_exists("../Cargo.toml")) {
         // todo: copy bin/lib after
         verify(exec("cargo build --%s --manifest-path ../Cargo.toml --target-dir .",
             debug ? "debug" : "release") == 0, "rust compilation");
-
     } else if (cmake_conf || file_exists("../CMakeLists.txt")) {
         /// configure
         if (!file_exists("CMakeCache.txt")) {
@@ -400,15 +358,19 @@ bool import_make(import im) {
                 "cmake -B . -S .. -DCMAKE_INSTALL_PREFIX=%o -DCMAKE_BUILD_TYPE=%s %o", install, build, im);
             verify(iconf == 0, "%o: configure failed", im->name);
         }
-    
         /// build & install
-        /// in A-type build we set j to core / 2, unless the repo was large, in which it is set to 4
         int    icmd = exec("%o cmake --build . -j8", env);
         int   iinst = exec("%o cmake --install .",   env);
 
     } else {
         cstr Makefile = "Makefile";
-        if (!file_exists("Makefile")) {
+        /// build for A-type projects
+        if (file_exists("../%s", Makefile) && file_exists("../build", Makefile)) {
+            cd(im->import_path);
+            verify(exec("%o make", env) == 0, "make");
+            cd(im->build_path);
+        } else if (!file_exists("Makefile")) {
+            /// build for automake projects
             if (file_exists("../configure.ac") || file_exists("../configure") || file_exists("../config")) {
                 /// generate configuration scripts if available
                 if (!file_exists("../configure") && file_exists("../configure.ac")) {
@@ -426,23 +388,13 @@ bool import_make(import im) {
                         im) == 0, configure);
                 }
             }
-        }
-        if (file_exists("%s", Makefile)) {
-            path cwd = path_cwd(2048);
-            print("cwd = %o", cwd);
-            verify(exec("%o make -f %s install", env, Makefile) == 0, "make");
+            if (file_exists("%s", Makefile)) {
+                path cwd = path_cwd(2048);
+                print("cwd = %o", cwd);
+                verify(exec("%o make -f %s install", env, Makefile) == 0, "make");
+            }
         }
     }
-
-    /*cd(im->build_path);
-    if (dir_exists("share")) {
-        /// copy this to our build folder, we must accumulate 'share' resources into our own
-        /// when we package apps, this accumulation of share is desired
-        /// its not a practical thing to crawl-through multiple overlapping projects that exist in different folders
-        path from = form(path, "share");
-        path to   = form(path, "%o/share/%o", im->tapestry->install, im->name);
-        cp(from, to, true, true);
-    }*/
     return true;
 }
 
@@ -474,42 +426,30 @@ static int filename_index(array files, path f) {
     return -1;
 }
 
+/// install headers, then overlay built headers; then install libs and app targets
 i32 tapestry_install(tapestry a) {
     path   install      = a->install;
     path   install_inc  = form(path, "%o/include", install);
     path   install_lib  = form(path, "%o/lib",     install);
     path   install_app  = form(path, "%o/bin",     install);
-
-    /// install lib headers
     path   project_lib = form(path, "%o/lib", a->project_path);
     path   build_lib   = form(path, "%o/lib", a->build_path);
     array  project_h   = headers(project_lib);
     array  build_h     = headers(build_lib);
 
-    /// skip files that exist as built headers (generated)
-    each(project_h, path, f) {
-        if (filename_index(build_h, f) >= 0)
-            continue;
-        exec("rsync -a %o %o/%o/", f, install_inc);
-    }
+    each(project_h, path, f)
+        if (filename_index(build_h, f) < 0)
+            exec("rsync -a %o %o/%o/", f, install_inc);
 
-    /// copy all build headers
-    each (build_h, path, f) {
-        string s = filename(f);
+    each (build_h, path, f)
         if (!eq(s, "import"))
-            exec("rsync -a %o %o/", f, install_inc);
-    }
+            exec("rsync -a %o %o/", filename(f), install_inc);
 
-    /// install libs
-    each(a->lib_targets, path, lib) {
-        path f_lib = filename(lib);
-        exec("rsync -a %o %o/%o", lib, install_lib, f_lib);
-    }
-    /// install apps
-    each(a->app_targets, path, app) {
-        path f_app = filename(app);
-        exec("rsync -a %o %o/%o", app, install_app, f_app);
-    }
+    each(a->lib_targets, path, lib)
+        exec("rsync -a %o %o/%o", lib, install_lib, filename(lib));
+
+    each(a->app_targets, path, app)
+        exec("rsync -a %o %o/%o", app, install_app, filename(app));
 
     return 0;
 }
@@ -543,9 +483,6 @@ none cflags_libs(tapestry a, string* cflags, string* libs) {
                 }
             }
         
-        /// add each -l under import. these are not what the library links with,
-        /// but what we link to the library with; its better than having two sections, 
-        /// more succinct; no configuration when compiling a library starts with -l)
         bool has_lib = false;
         each (im->config, string, conf) {
             if (starts_with(conf, "-l")) {
@@ -554,8 +491,7 @@ none cflags_libs(tapestry a, string* cflags, string* libs) {
                 has_lib = true;
             }
         }
-
-        if (!has_lib) { /// we can assume if no libs are mentioned in import, this project has a lib of its same name; that can be different for resource imports and we may handle it in a succinct way when it arises
+        if (!has_lib) {
             concat(*libs, form(string, "-l%o", im->name));
             append(*libs, " ");
         }
@@ -685,8 +621,7 @@ i32 tapestry_build(tapestry a, path bc) {
                 (has_lib && i == 2) ? build_lib : flags->build_dir,
                 dir, lib_src, include); /// finally, an explicit -I of our directive
             
-            /// for each source file, make objects file names, 
-            /// and compile them if they are modified prior to source
+            /// for each source file, make objects file names, and compile if changed
             each(lang->source, path, src) {
                 string module = filename(src);
                 string module_name = stem(src);
@@ -695,7 +630,6 @@ i32 tapestry_build(tapestry a, path bc) {
                 latest_o = max(latest_o, modified_time(o_path));
                 push(lang->objs, o_path);
                 push(obj, o_path);
-                //print("adding obj: %o", o_path);
 
                 /// recompile if newer / includes differ
                 i64 mtime = modified_time(src);
@@ -713,7 +647,6 @@ i32 tapestry_build(tapestry a, path bc) {
         string lflags = string(alloc, 64);
         //concat(lflags, form(string, "-L%o/lib ", a->build_path));
         concat(lflags, form(string, "-L%o/lib -Wl,-rpath,%o/lib", a->install, a->install));
-
 
         if (is_lib) {
             path output_lib = form(path, "%o/lib/%s%o%s", a->build_path, lib_pre, n2, lib_ext);
@@ -757,7 +690,7 @@ i32 tapestry_build(tapestry a, path bc) {
 
     /// an app could perhaps initialize its own installation in a post-install -- fetching resources etc
     if (dir_exists("%o/share", a->project_path)) {
-        verify (exec("rsync -a %o/share %o/share/%o", a->project_path, a->install, a->name) == 0,
+        verify (exec("rsync -a %o/share/ %o/share/%o/", a->project_path, a->install, a->name) == 0,
             "project resources");
     }
 
