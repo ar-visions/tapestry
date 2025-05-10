@@ -367,7 +367,8 @@ bool import_make(import im) {
         /// build for A-type projects
         if (file_exists("../%s", Makefile) && file_exists("../build", Makefile)) {
             cd(im->import_path);
-            verify(exec("%o make", env) == 0, "make");
+            int imake = exec("%o make", env);
+            verify(imake == 0, "make");
             cd(im->build_path);
         } else if (!file_exists("Makefile")) {
             /// build for automake projects
@@ -390,7 +391,6 @@ bool import_make(import im) {
             }
             if (file_exists("%s", Makefile)) {
                 path cwd = path_cwd(2048);
-                print("cwd = %o", cwd);
                 verify(exec("%o make -f %s install", env, Makefile) == 0, "make");
             }
         }
@@ -439,11 +439,11 @@ i32 tapestry_install(tapestry a) {
 
     each(project_h, path, f)
         if (filename_index(build_h, f) < 0)
-            exec("rsync -a %o %o/%o/", f, install_inc);
+            exec("rsync -a %o %o/", f, install_inc);
 
     each (build_h, path, f)
-        if (!eq(s, "import"))
-            exec("rsync -a %o %o/", filename(f), install_inc);
+        if (!eq(filename(f), "import"))
+            exec("rsync -a %o %o/", f, install_inc);
 
     each(a->lib_targets, path, lib)
         exec("rsync -a %o %o/%o", lib, install_lib, filename(lib));
