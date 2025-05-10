@@ -44,6 +44,15 @@
 #ifndef string_intern
 #define string_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
+#ifndef watch_intern
+#define watch_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
+#ifndef unit_intern
+#define unit_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
+#ifndef mutex_intern
+#define mutex_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
 #ifndef line_intern
 #define line_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
@@ -66,6 +75,4 @@
 #endif
 
 
-#include <A>
-#include <A-methods>
 #endif /* _A_PUBLIC_ */

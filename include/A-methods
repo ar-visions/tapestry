@@ -112,6 +112,8 @@
 #define contains(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->contains(_i_, ## __VA_ARGS__); })
 #undef set
 #define set(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->set(_i_, ## __VA_ARGS__); })
+#undef lookup
+#define lookup(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->lookup(_i_, ## __VA_ARGS__); })
 #undef fetch
 #define fetch(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->fetch(_i_, ## __VA_ARGS__); })
 #undef rm
@@ -160,6 +162,10 @@
 #define cmp(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->cmp(_i_, ## __VA_ARGS__); })
 #undef eq
 #define eq(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->eq(_i_, ## __VA_ARGS__); })
+#undef pause
+#define pause(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->pause(_i_, ## __VA_ARGS__); })
+#undef start
+#define start(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->start(_i_, ## __VA_ARGS__); })
 #undef exists
 #define exists(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->exists(_i_, ## __VA_ARGS__); })
 #undef make_dir

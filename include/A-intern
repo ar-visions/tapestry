@@ -30,6 +30,12 @@
 #define fn_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef string_intern
 #define string_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
+#undef watch_intern
+#define watch_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
+#undef unit_intern
+#define unit_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
+#undef mutex_intern
+#define mutex_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef line_intern
 #define line_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 

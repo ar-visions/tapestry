@@ -515,6 +515,102 @@
     instance; \
 })
 #ifndef NDEBUG
+    //#define TC_watch(MEMBER, VALUE) A_validate_type(VALUE, A_member(isa(instance), A_TYPE_PROP|A_TYPE_INTERN|A_TYPE_PRIV, #MEMBER)->type)
+    #define TC_watch(MEMBER, VALUE) VALUE
+#else
+    #define TC_watch(MEMBER, VALUE) VALUE
+#endif
+#define _ARG_COUNT_IMPL_watch(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
+#define _ARG_COUNT_I_watch(...) _ARG_COUNT_IMPL_watch(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define _ARG_COUNT_watch(...)   _ARG_COUNT_I_watch("A-type", ## __VA_ARGS__)
+#define _COMBINE_watch_(A, B)   A##B
+#define _COMBINE_watch(A, B)    _COMBINE_watch_(A, B)
+#define _N_ARGS_watch_0( TYPE)
+#define _N_ARGS_watch_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_watch_2( TYPE, a,b) instance->a = TC_watch(a,b);
+#define _N_ARGS_watch_4( TYPE, a,b, c,d) _N_ARGS_watch_2(TYPE, a,b) instance->c = TC_watch(c,d);
+#define _N_ARGS_watch_6( TYPE, a,b, c,d, e,f) _N_ARGS_watch_4(TYPE, a,b, c,d) instance->e = TC_watch(e,f);
+#define _N_ARGS_watch_8( TYPE, a,b, c,d, e,f, g,h) _N_ARGS_watch_6(TYPE, a,b, c,d, e,f) instance->g = TC_watch(g,h);
+#define _N_ARGS_watch_10(TYPE, a,b, c,d, e,f, g,h, i,j) _N_ARGS_watch_8(TYPE, a,b, c,d, e,f, g,h) instance->i = TC_watch(i,j);
+#define _N_ARGS_watch_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) _N_ARGS_watch_10(TYPE, a,b, c,d, e,f, g,h, i,j) instance->l = TC_watch(l,m);
+#define _N_ARGS_watch_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) _N_ARGS_watch_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) instance->n = TC_watch(n,o);
+#define _N_ARGS_watch_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) _N_ARGS_watch_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) instance->p = TC_watch(p,q);
+#define _N_ARGS_watch_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) _N_ARGS_watch_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) instance->r = TC_watch(r,s);
+#define _N_ARGS_watch_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) _N_ARGS_watch_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) instance->t = TC_watch(t,u);
+#define _N_ARGS_watch_22(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u, v,w) _N_ARGS_watch_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) instance->v = TC_watch(v,w);
+#define _N_ARGS_HELPER2_watch(TYPE, N, ...)  _COMBINE_watch(_N_ARGS_watch_, N)(TYPE, ## __VA_ARGS__)
+#define _N_ARGS_watch(TYPE,...)    _N_ARGS_HELPER2_watch(TYPE, _ARG_COUNT_watch(__VA_ARGS__), ## __VA_ARGS__)
+#define watch(...) ({ \
+    watch instance = (watch)A_alloc(typeid(watch), 1, true); \
+    _N_ARGS_watch(watch, ## __VA_ARGS__); \
+    A_initialize((object)instance); \
+    instance; \
+})
+#ifndef NDEBUG
+    //#define TC_unit(MEMBER, VALUE) A_validate_type(VALUE, A_member(isa(instance), A_TYPE_PROP|A_TYPE_INTERN|A_TYPE_PRIV, #MEMBER)->type)
+    #define TC_unit(MEMBER, VALUE) VALUE
+#else
+    #define TC_unit(MEMBER, VALUE) VALUE
+#endif
+#define _ARG_COUNT_IMPL_unit(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
+#define _ARG_COUNT_I_unit(...) _ARG_COUNT_IMPL_unit(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define _ARG_COUNT_unit(...)   _ARG_COUNT_I_unit("A-type", ## __VA_ARGS__)
+#define _COMBINE_unit_(A, B)   A##B
+#define _COMBINE_unit(A, B)    _COMBINE_unit_(A, B)
+#define _N_ARGS_unit_0( TYPE)
+#define _N_ARGS_unit_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_unit_2( TYPE, a,b) instance->a = TC_unit(a,b);
+#define _N_ARGS_unit_4( TYPE, a,b, c,d) _N_ARGS_unit_2(TYPE, a,b) instance->c = TC_unit(c,d);
+#define _N_ARGS_unit_6( TYPE, a,b, c,d, e,f) _N_ARGS_unit_4(TYPE, a,b, c,d) instance->e = TC_unit(e,f);
+#define _N_ARGS_unit_8( TYPE, a,b, c,d, e,f, g,h) _N_ARGS_unit_6(TYPE, a,b, c,d, e,f) instance->g = TC_unit(g,h);
+#define _N_ARGS_unit_10(TYPE, a,b, c,d, e,f, g,h, i,j) _N_ARGS_unit_8(TYPE, a,b, c,d, e,f, g,h) instance->i = TC_unit(i,j);
+#define _N_ARGS_unit_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) _N_ARGS_unit_10(TYPE, a,b, c,d, e,f, g,h, i,j) instance->l = TC_unit(l,m);
+#define _N_ARGS_unit_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) _N_ARGS_unit_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) instance->n = TC_unit(n,o);
+#define _N_ARGS_unit_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) _N_ARGS_unit_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) instance->p = TC_unit(p,q);
+#define _N_ARGS_unit_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) _N_ARGS_unit_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) instance->r = TC_unit(r,s);
+#define _N_ARGS_unit_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) _N_ARGS_unit_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) instance->t = TC_unit(t,u);
+#define _N_ARGS_unit_22(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u, v,w) _N_ARGS_unit_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) instance->v = TC_unit(v,w);
+#define _N_ARGS_HELPER2_unit(TYPE, N, ...)  _COMBINE_unit(_N_ARGS_unit_, N)(TYPE, ## __VA_ARGS__)
+#define _N_ARGS_unit(TYPE,...)    _N_ARGS_HELPER2_unit(TYPE, _ARG_COUNT_unit(__VA_ARGS__), ## __VA_ARGS__)
+#define unit(...) ({ \
+    unit instance = (unit)A_alloc(typeid(unit), 1, true); \
+    _N_ARGS_unit(unit, ## __VA_ARGS__); \
+    A_initialize((object)instance); \
+    instance; \
+})
+#ifndef NDEBUG
+    //#define TC_mutex(MEMBER, VALUE) A_validate_type(VALUE, A_member(isa(instance), A_TYPE_PROP|A_TYPE_INTERN|A_TYPE_PRIV, #MEMBER)->type)
+    #define TC_mutex(MEMBER, VALUE) VALUE
+#else
+    #define TC_mutex(MEMBER, VALUE) VALUE
+#endif
+#define _ARG_COUNT_IMPL_mutex(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
+#define _ARG_COUNT_I_mutex(...) _ARG_COUNT_IMPL_mutex(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define _ARG_COUNT_mutex(...)   _ARG_COUNT_I_mutex("A-type", ## __VA_ARGS__)
+#define _COMBINE_mutex_(A, B)   A##B
+#define _COMBINE_mutex(A, B)    _COMBINE_mutex_(A, B)
+#define _N_ARGS_mutex_0( TYPE)
+#define _N_ARGS_mutex_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_mutex_2( TYPE, a,b) instance->a = TC_mutex(a,b);
+#define _N_ARGS_mutex_4( TYPE, a,b, c,d) _N_ARGS_mutex_2(TYPE, a,b) instance->c = TC_mutex(c,d);
+#define _N_ARGS_mutex_6( TYPE, a,b, c,d, e,f) _N_ARGS_mutex_4(TYPE, a,b, c,d) instance->e = TC_mutex(e,f);
+#define _N_ARGS_mutex_8( TYPE, a,b, c,d, e,f, g,h) _N_ARGS_mutex_6(TYPE, a,b, c,d, e,f) instance->g = TC_mutex(g,h);
+#define _N_ARGS_mutex_10(TYPE, a,b, c,d, e,f, g,h, i,j) _N_ARGS_mutex_8(TYPE, a,b, c,d, e,f, g,h) instance->i = TC_mutex(i,j);
+#define _N_ARGS_mutex_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) _N_ARGS_mutex_10(TYPE, a,b, c,d, e,f, g,h, i,j) instance->l = TC_mutex(l,m);
+#define _N_ARGS_mutex_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) _N_ARGS_mutex_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) instance->n = TC_mutex(n,o);
+#define _N_ARGS_mutex_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) _N_ARGS_mutex_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) instance->p = TC_mutex(p,q);
+#define _N_ARGS_mutex_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) _N_ARGS_mutex_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) instance->r = TC_mutex(r,s);
+#define _N_ARGS_mutex_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) _N_ARGS_mutex_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) instance->t = TC_mutex(t,u);
+#define _N_ARGS_mutex_22(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u, v,w) _N_ARGS_mutex_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) instance->v = TC_mutex(v,w);
+#define _N_ARGS_HELPER2_mutex(TYPE, N, ...)  _COMBINE_mutex(_N_ARGS_mutex_, N)(TYPE, ## __VA_ARGS__)
+#define _N_ARGS_mutex(TYPE,...)    _N_ARGS_HELPER2_mutex(TYPE, _ARG_COUNT_mutex(__VA_ARGS__), ## __VA_ARGS__)
+#define mutex(...) ({ \
+    mutex instance = (mutex)A_alloc(typeid(mutex), 1, true); \
+    _N_ARGS_mutex(mutex, ## __VA_ARGS__); \
+    A_initialize((object)instance); \
+    instance; \
+})
+#ifndef NDEBUG
     //#define TC_path(MEMBER, VALUE) A_validate_type(VALUE, A_member(isa(instance), A_TYPE_PROP|A_TYPE_INTERN|A_TYPE_PRIV, #MEMBER)->type)
     #define TC_path(MEMBER, VALUE) VALUE
 #else
