@@ -13,10 +13,10 @@ export TAPESTRY="$tapestry"
 BASH_FILE=""
 
 # select profile file
-if   [ -f "$HOME/.bash_profile" ]; then
-    BASH_FILE="$HOME/.bash_profile"
-elif [ -f "$HOME/.bashrc"       ]; then
+if   [ -f "$HOME/.bashrc" ]; then
     BASH_FILE="$HOME/.bashrc"
+elif [ -f "$HOME/.bash_profile"       ]; then
+    BASH_FILE="$HOME/.bash_profile"
 else
     BASH_FILE="$HOME/.bash_profile"
     touch "$BASH_FILE"
@@ -69,5 +69,10 @@ echo "tapestry: environment set"
 
 # 4. move updated file back
 mv "$f" "$BASH_FILE"
+
+# setup A symlink in checkout
+mkdir -p checkout
+cd checkout
+[ -L A ] || ln -s ../../A
 
 make

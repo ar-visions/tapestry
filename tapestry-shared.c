@@ -659,7 +659,9 @@ i32 tapestry_build(tapestry a, path bc) {
                     cpp ? CXX : CC,
                     lflags, base_libs, obj, output_lib) == 0, "linking");
             }
-            push(a->lib_targets, output_lib);
+            // install lib right away
+            exec("rsync -a %o %o", output_lib, install_lib);
+            //push(a->lib_targets, output_lib);
         } else {
             each (obj_c, path, obj) {
                 string module_name = stem(obj);
