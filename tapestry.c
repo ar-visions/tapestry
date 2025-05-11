@@ -5,7 +5,7 @@
 #include <tapestry-init>
 #include <tapestry-methods>
 #include <A-init>
-
+#include <A-methods>
 #include <signal.h>
 #include <unistd.h>
 

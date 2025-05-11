@@ -5,6 +5,7 @@
 #include <tapestry-methods>
 #include <tapestry-init>
 #include <A-init>
+#include <A-methods>
 #include <sys/stat.h>
 #include <utime.h>
 
@@ -371,15 +372,17 @@ bool import_make(import im) {
             verify(imake == 0, "make");
             cd(im->build_path);
         } else if (!file_exists("Makefile")) {
+            cd(im->import_path);
             /// build for automake projects
-            if (file_exists("../configure.ac") || file_exists("../configure") || file_exists("../config")) {
+            if (file_exists("./configure.ac") || file_exists("./configure") || file_exists("./config")) {
                 /// generate configuration scripts if available
-                if (!file_exists("../configure") && file_exists("../configure.ac")) {
-                    verify(exec("autoupdate ..")    == 0, "autoupdate");
-                    verify(exec("autoreconf -i ..") == 0, "autoreconf");
+                if (!file_exists("./configure") && file_exists("./configure.ac")) {
+                    verify(exec("autoupdate .")    == 0, "autoupdate");
+                    verify(exec("pwd") == 0, "autoreconf");
+                    verify(exec("autoreconf -i .") == 0, "autoreconf");
                 }
                 /// prefer our pre/generated script configure, fallback to config
-                cstr configure = file_exists("../configure") ? "../configure" : "../config";
+                cstr configure = file_exists("./configure") ? "./configure" : "./config";
                 if (file_exists("%s", configure)) {
                     verify(exec("%o %s%s --prefix=%o %o",
                         env,

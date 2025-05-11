@@ -1,6 +1,6 @@
 #ifndef TAPESTRY
 #define TAPESTRY
-//#include <A>
+#include <A>
 
 forward(tapestry)
 
