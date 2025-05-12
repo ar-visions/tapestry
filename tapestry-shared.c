@@ -360,7 +360,7 @@ bool import_make(import im) {
             verify(iconf == 0, "%o: configure failed", im->name);
         }
         /// build & install
-        int    icmd = exec("%o cmake --build . -j8", env);
+        int    icmd = exec("%o cmake --build . -j16", env);
         int   iinst = exec("%o cmake --install .",   env);
 
     } else {

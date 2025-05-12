@@ -9,13 +9,13 @@ TAPESTRY           ?= $(patsubst %/,%,$(dir $(MAKEFILE_PATH_ROOT)))
 TAPESTRY_FILE      := $(SRC_ROOT)/build
 
 ifeq (,$(findstring $(PROJECT),$(DBG)))
-BUILD_DIR := $(SRC_ROOT)/build
+BUILD_DIR := $(SRC_ROOT)/release
 else
 BUILD_DIR := $(SRC_ROOT)/debug
 endif
 
 TAPESTRY_BIN := $(TAPESTRY)/bin/tapestry
-DBG     ?=
+DBG     := $(DBG)
 
 .PHONY: all tapestry
 all: $(TAPESTRY_BIN)
