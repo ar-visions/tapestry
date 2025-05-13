@@ -19,6 +19,13 @@ SHARED_LIB  = lib/$(LIB_PRE)tapestry.$(LIB_EXT)
 APP_OBJS    = tapestry.o
 TARGET      = bin/tapestry
 
+# set -g2 if ,tapestry, is inside of ,$(DBG),
+ifeq ($(findstring ,$(PROJECT),,$(DBG)),)
+	CFLAGS := $(CFLAGS) -g2 -O0
+else
+	CFLAGS := $(CFLAGS) -O2
+endif
+
 all: $(SHARED_LIB) $(TARGET)
 
 tapestry-shared.o: tapestry-shared.c

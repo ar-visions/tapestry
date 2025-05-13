@@ -9,6 +9,8 @@
 #include <sys/stat.h>
 #include <utime.h>
 
+static i64 ancestor_mod = 0;
+
 #if defined(__x86_64__) || defined(_M_X64)
 static symbol arch = "x86_64";
 #elif defined(__i386__) || defined(_M_IX86)
@@ -27,12 +29,29 @@ static symbol lib_pre  = "";    static symbol lib_ext  = ".dll";    static symbo
 static symbol lib_pre  = "lib"; static symbol lib_ext  = ".dylib";  static symbol app_ext  = "";        static symbol platform = "darwin";
 #endif
 
-none import_sync_tokens(import im);
-
 bool is_debug(tapestry t, string name) {
-    string f = form(string, ",%o,", t->dbg);
-    string s = form(string, ",%o,", name);
+    string f = f(string, ",%o,", t->dbg);
+    string s = f(string, ",%o,", name);
     return strstr(f->chars, s->chars) != null;
+}
+
+none sync_tokens(tapestry t, path build_path, string name) {
+    path t0 = form(path, "%o/tapestry-token", build_path);
+    path t1 = form(path, "%o/tokens/%o", t->install, name);
+    struct stat build_token, installed_token;
+    /// create token pair (build & install) to indicate no errors during config/build/install
+    cstr both[2] = { cstring(t0), cstring(t1) };
+    for (int i = 0; i < 2; i++) {
+        FILE* ftoken = fopen(both[i], "wb");
+        fwrite("im-a-token", 10, 1, ftoken);
+        fclose(ftoken);
+    }
+    int istat_build   = stat(cstring(t0), &build_token);
+    int istat_install = stat(cstring(t1), &installed_token);
+    struct utimbuf times;
+    times.actime  = build_token.st_atime;  // access time
+    times.modtime = build_token.st_mtime;  // modification time
+    utime(cstring(t1), &times);
 }
 
 none import_init(import im) {
@@ -41,10 +60,9 @@ none import_init(import im) {
     path   src     = im->tapestry->src;
     bool   debug      = is_debug(im->tapestry, im->name);
     symbol build_type = debug ? "debug" : "release";
-    path checkout     = form(path, "%o/checkout", install);
-    im->import_path   = form(path, "%o/%o", checkout, im->name);
-    im->build_path    = form(path, "%o/%s", im->import_path, build_type);
-
+    path checkout     = f(path, "%o/checkout", install);
+    im->import_path   = f(path, "%o/%o", checkout, im->name);
+    im->build_path    = f(path, "%o/%s", im->import_path, build_type);
     if (!dir_exists("%o/%o", checkout, im->name)) {
         cd(checkout);
         if (A_len(src) && dir_exists("%o/%o", src, im->name)) {
@@ -71,6 +89,9 @@ none import_init(import im) {
         set(m_copy, string("path"), af_remote);
         tapestry t_remote = tapestry(m_copy);
         im->exports = hold(t_remote->exports);
+        i64 mod = modified_time(f(path, "%o/tokens/%o", im->tapestry->install, im->name));
+        if (mod && (!ancestor_mod || ancestor_mod < mod))
+             ancestor_mod = mod;
         drop(t_remote);
     }
     make_dir(im->build_path);
@@ -86,7 +107,7 @@ none import_init(import im) {
         print("! %o: command: %o", im->name, cmd);
         verify(exec("%o", evaluate(cmd, im->tapestry->environment)) == 0, "expected successful ! inline command");
     }
-    import_sync_tokens(im);
+    sync_tokens(im->tapestry, im->build_path, im->name);
     cd(cwd);
 }
 
@@ -284,30 +305,12 @@ string import_cmake_location(import im) {
     return null;
 }
 
-none import_sync_tokens(import im) {
-    path t0 = form(path, "tapestry-token");
-    path t1 = form(path, "%o/tokens/%o", im->tapestry->install, im->name);
-    struct stat build_token, installed_token;
-    /// create token pair (build & install) to indicate no errors during config/build/install
-    cstr both[2] = { cstring(t0), cstring(t1) };
-    for (int i = 0; i < 2; i++) {
-        FILE* ftoken = fopen(both[i], "wb");
-        fwrite("im-a-token", 10, 1, ftoken);
-        fclose(ftoken);
-    }
-    int istat_build   = stat(cstring(t0), &build_token);
-    int istat_install = stat(cstring(t1), &installed_token);
-    struct utimbuf times;
-    times.actime  = build_token.st_atime;  // access time
-    times.modtime = build_token.st_mtime;  // modification time
-    utime(cstring(t1), &times);
-}
-
 /// handle autoconfig (if present) and resultant / static Makefile
 bool import_make(import im) {
-    path install = im->tapestry->install;
+    tapestry t = im->tapestry;
+    path install = t->install;
     i64 conf_status = INT64_MIN;
-    bool debug      = is_debug(im->tapestry, im->name);
+    bool debug      = is_debug(t, im->name);
     path t0 = form(path, "tapestry-token");
     path t1 = form(path, "%o/tokens/%o", install, im->name);
     path checkout = form(path, "%o/checkout", install);
@@ -329,9 +332,8 @@ bool import_make(import im) {
         if (conf_status == 0) {
             i64 latest = 0;
             path latest_f = latest_modified(im->import_path, &latest);
-            if (latest > token0) {
+            if (latest > token0 || ancestor_mod > token0)
                 conf_status = -1;
-            }
         }
     }
 
@@ -523,6 +525,7 @@ i32 tapestry_build(tapestry a, path bc) {
     cd(a->project_path);
     AType type = isa(a->build_path);
     make_dir(a->build_path);
+
     path   project_lib  = form  (path, "%o/lib",  a->project_path);
     path   build_lib    = form  (path, "%o/lib",  a->build_path);
     path   build_app    = form  (path, "%o/app",  a->build_path);
@@ -630,13 +633,14 @@ i32 tapestry_build(tapestry a, path bc) {
                 string module_name = stem(src);
                 string o_file = form(string, "%o.o",  module);
                 path   o_path = form(path,   "%o/%o", a->build_path, o_file);
-                latest_o = max(latest_o, modified_time(o_path));
+                i64    o_modified  = modified_time(o_path);
+                latest_o = max(latest_o, o_modified);
                 push(lang->objs, o_path);
                 push(obj, o_path);
 
                 /// recompile if newer / includes differ
                 i64 mtime = modified_time(src);
-                bool source_newer  = mtime > modified_time(o_path);
+                bool source_newer  = (mtime > o_modified) || (a->ancestor_mod && (a->ancestor_mod < mtime)); // || ; /// | project_rebuild (based on newest project we depend on)
                 bool header_change = htime && htime > modified_time(o_path);
                 if (source_newer || header_change) {
                     int compile = exec("%o -DMODULE=\"\\\"%o\\\"\" %o -o %o", compiler, module_name, src, o_path);
@@ -698,6 +702,10 @@ i32 tapestry_build(tapestry a, path bc) {
         verify (exec("rsync -a %o/share/ %o/share/%o/", a->project_path, a->install, a->name) == 0,
             "project resources");
     }
+
+    /// now we set the token here! (we do this twice; the import layer does it 
+    // (and CAN be skipped if its a tapestry project -- should be without side effect, though, since its immediately after))
+    sync_tokens(a, a->build_path, a->name);
 
     return error_code;
 }

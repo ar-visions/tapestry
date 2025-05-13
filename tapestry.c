@@ -21,6 +21,10 @@ void on_signal(int sig) {
 } 
 
 int main(int argc, cstr argv[]) {
+    // this is useful for apps built in debug-mode
+    // debug is for development mode, so lets add features to make development easier
+    
+    // heres one:
     // know thy-self (this should be integral to A_start; for that though, we need artifact tracing)
     char    rpath[4096];
     ssize_t ln = readlink("/proc/self/exe", rpath, sizeof(rpath) - 1);
