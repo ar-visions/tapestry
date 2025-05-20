@@ -229,6 +229,7 @@ none tapestry_with_map(tapestry a, map m) {
                     if (len(s_imports))
                         append(s_imports, " ");
                     concat(s_imports, name);
+                    /// currently its the headers.sh
                     im = allocate(import,
                         tapestry, a,
                         name,   name,
@@ -640,7 +641,7 @@ i32 tapestry_build(tapestry a, path bc) {
 
                 /// recompile if newer / includes differ
                 i64 mtime = modified_time(src);
-                bool source_newer  = (mtime > o_modified) || (a->ancestor_mod && (a->ancestor_mod < mtime)); // || ; /// | project_rebuild (based on newest project we depend on)
+                bool source_newer  = (mtime > o_modified) || (ancestor_mod && (ancestor_mod < mtime)); // || ; /// | project_rebuild (based on newest project we depend on)
                 bool header_change = htime && htime > modified_time(o_path);
                 if (source_newer || header_change) {
                     int compile = exec("%o -DMODULE=\"\\\"%o\\\"\" %o -o %o", compiler, module_name, src, o_path);
