@@ -126,6 +126,14 @@
 #define len(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->len(_i_, ## __VA_ARGS__); })
 #undef call
 #define call(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->call(_i_, ## __VA_ARGS__); })
+#undef is_numeric
+#define is_numeric(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->is_numeric(_i_, ## __VA_ARGS__); })
+#undef first
+#define first(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->first(_i_, ## __VA_ARGS__); })
+#undef last
+#define last(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->last(_i_, ## __VA_ARGS__); })
+#undef real_value
+#define real_value(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->real_value(_i_, ## __VA_ARGS__); })
 #undef len
 #define len(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->len(_i_, ## __VA_ARGS__); })
 #undef ucase
@@ -166,6 +174,10 @@
 #define pause(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->pause(_i_, ## __VA_ARGS__); })
 #undef start
 #define start(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->start(_i_, ## __VA_ARGS__); })
+#undef lock
+#define lock(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->lock(_i_, ## __VA_ARGS__); })
+#undef unlock
+#define unlock(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->unlock(_i_, ## __VA_ARGS__); })
 #undef exists
 #define exists(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->exists(_i_, ## __VA_ARGS__); })
 #undef make_dir
