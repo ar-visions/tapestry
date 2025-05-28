@@ -716,6 +716,6 @@ none tapestry_init(tapestry a) {
     a->name = filename(a->project_path);
 }
 
-define_class(import)
-define_class(tapestry)
-define_class(flag)
+define_class(import,    A)
+define_class(tapestry,  A)
+define_class(flag,      A)

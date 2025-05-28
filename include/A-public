@@ -53,19 +53,21 @@
 #ifndef mutex_intern
 #define mutex_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
+#ifndef async_intern
+#define async_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
 #ifndef line_intern
 #define line_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
 
+#ifndef ATypes_intern
+#define ATypes_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#endif
 #ifndef map_intern
 #define map_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
 #ifndef path_intern
 #define path_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
-#endif
-
-#ifndef ATypes_intern
-#define ATypes_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
 #ifndef array_string_intern
 #define array_string_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
@@ -73,6 +75,8 @@
 #ifndef array_map_intern
 #define array_map_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
+
+
 
 
 #endif /* _A_PUBLIC_ */

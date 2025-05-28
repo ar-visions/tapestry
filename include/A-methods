@@ -110,6 +110,10 @@
 #define lookup(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->lookup(_i_, ## __VA_ARGS__); })
 #undef contains
 #define contains(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->contains(_i_, ## __VA_ARGS__); })
+#undef clear
+#define clear(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->clear(_i_, ## __VA_ARGS__); })
+#undef clear
+#define clear(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->clear(_i_, ## __VA_ARGS__); })
 #undef set
 #define set(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->set(_i_, ## __VA_ARGS__); })
 #undef lookup
@@ -156,6 +160,10 @@
 #define concat(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->concat(_i_, ## __VA_ARGS__); })
 #undef trim
 #define trim(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->trim(_i_, ## __VA_ARGS__); })
+#undef ltrim
+#define ltrim(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->ltrim(_i_, ## __VA_ARGS__); })
+#undef rtrim
+#define rtrim(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->rtrim(_i_, ## __VA_ARGS__); })
 #undef mid
 #define mid(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->mid(_i_, ## __VA_ARGS__); })
 #undef reserve
@@ -178,6 +186,14 @@
 #define lock(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->lock(_i_, ## __VA_ARGS__); })
 #undef unlock
 #define unlock(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->unlock(_i_, ## __VA_ARGS__); })
+#undef cond_wait
+#define cond_wait(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->cond_wait(_i_, ## __VA_ARGS__); })
+#undef cond_signal
+#define cond_signal(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->cond_signal(_i_, ## __VA_ARGS__); })
+#undef cond_broadcast
+#define cond_broadcast(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->cond_broadcast(_i_, ## __VA_ARGS__); })
+#undef sync
+#define sync(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->sync(_i_, ## __VA_ARGS__); })
 #undef exists
 #define exists(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->exists(_i_, ## __VA_ARGS__); })
 #undef make_dir

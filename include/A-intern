@@ -36,19 +36,22 @@
 #define unit_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef mutex_intern
 #define mutex_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
+#undef async_intern
+#define async_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef line_intern
 #define line_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 
+#undef ATypes_intern
+#define ATypes_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef map_intern
 #define map_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef path_intern
 #define path_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
-
-#undef ATypes_intern
-#define ATypes_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef array_string_intern
 #define array_string_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef array_map_intern
 #define array_map_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
+
+
 
 #endif /* _A_INTERN_H_ */
