@@ -19,11 +19,42 @@ SHARED_LIB  = lib/$(LIB_PRE)tapestry.$(LIB_EXT)
 APP_OBJS    = tapestry.o
 TARGET      = bin/tapestry
 
-# set -g2 if ,tapestry, is inside of ,$(DBG),
-ifeq ($(findstring ,$(PROJECT),,$(DBG)),)
-	CFLAGS := $(CFLAGS) -g2 -O0
+
+
+
+# — pad your tokens so you only ever match whole names —  
+DBG_PAD     := ,$(DBG),  
+PROJECT_PAD := ,$(PROJECT),  
+EXCLUDE_PAD := ,-$(PROJECT),   # “-foo” means “do not debug foo”
+
+# — compute a single DEBUG_COND that is non-empty if and only if
+#   1) we see ,project, OR a literal * in DBG_PAD,  AND
+#   2) we do NOT see ,-project, in DBG_PAD   —
+DEBUG_COND := $(and \
+    $(or $(findstring $(PROJECT_PAD),$(DBG_PAD)) \
+         $(findstring *,$(DBG_PAD))) \
+  ,$(not $(findstring $(EXCLUDE_PAD),$(DBG_PAD))) \
+)
+
+DBG          := $(strip $(DBG))
+PROJECT      := $(strip $(PROJECT))
+DBG_PAD      := ,$(DBG),
+PROJECT_PAD  := ,$(PROJECT),
+EXCLUDE_PAD  := ,-$(PROJECT),
+DEBUG        := false
+
+ifneq ($(findstring $(EXCLUDE_PAD),$(DBG_PAD)),)
+  DEBUG := false
+else ifneq ($(findstring $(PROJECT_PAD),$(DBG_PAD)),)
+  DEBUG := true
+else ifneq ($(findstring *,$(DBG_PAD)),)
+  DEBUG := true
+endif
+
+ifeq ($(DEBUG),true)
+    CFLAGS := $(CFLAGS) -g2 -O0 
 else
-	CFLAGS := $(CFLAGS) -O2
+    CFLAGS := $(CFLAGS) -O2
 endif
 
 all: $(SHARED_LIB) $(TARGET)

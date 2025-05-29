@@ -2,7 +2,7 @@
 #ifndef _A_INIT_H_
 #define _A_INIT_H_
 
-#define TC_item(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(item, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(item, MEMBER); VALUE; })
+#define TC_item(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(item, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_item(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_item(...) _ARG_COUNT_IMPL_item(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_item(...)   _ARG_COUNT_I_item("A-type", ## __VA_ARGS__)
@@ -29,7 +29,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_message(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(message, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(message, MEMBER); VALUE; })
+#define TC_message(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(message, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_message(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_message(...) _ARG_COUNT_IMPL_message(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_message(...)   _ARG_COUNT_I_message("A-type", ## __VA_ARGS__)
@@ -56,7 +56,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_list(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(list, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(list, MEMBER); VALUE; })
+#define TC_list(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(list, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_list(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_list(...) _ARG_COUNT_IMPL_list(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_list(...)   _ARG_COUNT_I_list("A-type", ## __VA_ARGS__)
@@ -83,7 +83,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_buffer(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(buffer, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(buffer, MEMBER); VALUE; })
+#define TC_buffer(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(buffer, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_buffer(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_buffer(...) _ARG_COUNT_IMPL_buffer(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_buffer(...)   _ARG_COUNT_I_buffer("A-type", ## __VA_ARGS__)
@@ -110,7 +110,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_file(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(file, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(file, MEMBER); VALUE; })
+#define TC_file(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(file, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_file(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_file(...) _ARG_COUNT_IMPL_file(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_file(...)   _ARG_COUNT_I_file("A-type", ## __VA_ARGS__)
@@ -137,7 +137,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_shape(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(shape, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(shape, MEMBER); VALUE; })
+#define TC_shape(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(shape, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_shape(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_shape(...) _ARG_COUNT_IMPL_shape(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_shape(...)   _ARG_COUNT_I_shape("A-type", ## __VA_ARGS__)
@@ -164,7 +164,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_vector(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(vector, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(vector, MEMBER); VALUE; })
+#define TC_vector(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(vector, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_vector(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_vector(...) _ARG_COUNT_IMPL_vector(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_vector(...)   _ARG_COUNT_I_vector("A-type", ## __VA_ARGS__)
@@ -191,7 +191,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_subprocedure(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(subprocedure, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(subprocedure, MEMBER); VALUE; })
+#define TC_subprocedure(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(subprocedure, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_subprocedure(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_subprocedure(...) _ARG_COUNT_IMPL_subprocedure(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_subprocedure(...)   _ARG_COUNT_I_subprocedure("A-type", ## __VA_ARGS__)
@@ -218,7 +218,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_array(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(array, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(array, MEMBER); VALUE; })
+#define TC_array(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(array, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_array(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_array(...) _ARG_COUNT_IMPL_array(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_array(...)   _ARG_COUNT_I_array("A-type", ## __VA_ARGS__)
@@ -245,7 +245,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_ATypes(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(ATypes, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(ATypes, MEMBER); VALUE; })
+#define TC_ATypes(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(ATypes, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_ATypes(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_ATypes(...) _ARG_COUNT_IMPL_ATypes(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_ATypes(...)   _ARG_COUNT_I_ATypes("A-type", ## __VA_ARGS__)
@@ -272,7 +272,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_AF(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(AF, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(AF, MEMBER); VALUE; })
+#define TC_AF(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(AF, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_AF(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_AF(...) _ARG_COUNT_IMPL_AF(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_AF(...)   _ARG_COUNT_I_AF("A-type", ## __VA_ARGS__)
@@ -299,7 +299,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_hashmap(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(hashmap, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(hashmap, MEMBER); VALUE; })
+#define TC_hashmap(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(hashmap, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_hashmap(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_hashmap(...) _ARG_COUNT_IMPL_hashmap(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_hashmap(...)   _ARG_COUNT_I_hashmap("A-type", ## __VA_ARGS__)
@@ -326,7 +326,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_pair(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(pair, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(pair, MEMBER); VALUE; })
+#define TC_pair(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(pair, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_pair(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_pair(...) _ARG_COUNT_IMPL_pair(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_pair(...)   _ARG_COUNT_I_pair("A-type", ## __VA_ARGS__)
@@ -353,7 +353,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_map(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(map, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(map, MEMBER); VALUE; })
+#define TC_map(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(map, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_map(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_map(...) _ARG_COUNT_IMPL_map(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_map(...)   _ARG_COUNT_I_map("A-type", ## __VA_ARGS__)
@@ -380,7 +380,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_fn(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(fn, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(fn, MEMBER); VALUE; })
+#define TC_fn(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(fn, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_fn(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_fn(...) _ARG_COUNT_IMPL_fn(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_fn(...)   _ARG_COUNT_I_fn("A-type", ## __VA_ARGS__)
@@ -407,7 +407,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_string(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(string, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(string, MEMBER); VALUE; })
+#define TC_string(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(string, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_string(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_string(...) _ARG_COUNT_IMPL_string(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_string(...)   _ARG_COUNT_I_string("A-type", ## __VA_ARGS__)
@@ -434,7 +434,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_watch(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(watch, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(watch, MEMBER); VALUE; })
+#define TC_watch(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(watch, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_watch(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_watch(...) _ARG_COUNT_IMPL_watch(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_watch(...)   _ARG_COUNT_I_watch("A-type", ## __VA_ARGS__)
@@ -461,7 +461,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_unit(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(unit, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(unit, MEMBER); VALUE; })
+#define TC_unit(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(unit, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_unit(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_unit(...) _ARG_COUNT_IMPL_unit(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_unit(...)   _ARG_COUNT_I_unit("A-type", ## __VA_ARGS__)
@@ -488,7 +488,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_mutex(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(mutex, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(mutex, MEMBER); VALUE; })
+#define TC_mutex(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(mutex, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_mutex(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_mutex(...) _ARG_COUNT_IMPL_mutex(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_mutex(...)   _ARG_COUNT_I_mutex("A-type", ## __VA_ARGS__)
@@ -515,7 +515,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_async(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(async, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(async, MEMBER); VALUE; })
+#define TC_async(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(async, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_async(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_async(...) _ARG_COUNT_IMPL_async(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_async(...)   _ARG_COUNT_I_async("A-type", ## __VA_ARGS__)
@@ -542,7 +542,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_path(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(path, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(path, MEMBER); VALUE; })
+#define TC_path(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(path, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_path(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_path(...) _ARG_COUNT_IMPL_path(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_path(...)   _ARG_COUNT_I_path("A-type", ## __VA_ARGS__)
@@ -569,7 +569,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_line(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(line, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(line, MEMBER); VALUE; })
+#define TC_line(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(line, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_line(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_line(...) _ARG_COUNT_IMPL_line(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_line(...)   _ARG_COUNT_I_line("A-type", ## __VA_ARGS__)
@@ -596,7 +596,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_array_string(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(array_string, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(array_string, MEMBER); VALUE; })
+#define TC_array_string(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(array_string, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_array_string(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_array_string(...) _ARG_COUNT_IMPL_array_string(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_array_string(...)   _ARG_COUNT_I_array_string("A-type", ## __VA_ARGS__)
@@ -623,7 +623,7 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_array_map(MEMBER, VALUE) ({ printf("setting field bit (id: %i): %s\n", (int)FIELD_ID(array_map, MEMBER), #MEMBER);   (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(array_map, MEMBER); VALUE; })
+#define TC_array_map(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(array_map, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_array_map(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_array_map(...) _ARG_COUNT_IMPL_array_map(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define _ARG_COUNT_array_map(...)   _ARG_COUNT_I_array_map("A-type", ## __VA_ARGS__)

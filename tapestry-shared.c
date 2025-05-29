@@ -8,6 +8,7 @@
 #include <A-methods>
 #include <sys/stat.h>
 #include <utime.h>
+#include <limits.h>
 
 static i64 ancestor_mod = 0;
 
@@ -29,10 +30,32 @@ static symbol lib_pre  = "";    static symbol lib_ext  = ".dll";    static symbo
 static symbol lib_pre  = "lib"; static symbol lib_ext  = ".dylib";  static symbol app_ext  = "";        static symbol platform = "darwin";
 #endif
 
-bool is_debug(tapestry t, string name) {
-    string f = f(string, ",%o,", t->dbg);
-    string s = f(string, ",%o,", name);
-    return strstr(f->chars, s->chars) != null;
+static bool is_dbg(tapestry t, cstr name, bool is_remote) {
+    cstr  dbg = getenv("DBG");
+    char  dbg_str[PATH_MAX];
+    char name_str[PATH_MAX];
+    sprintf(dbg_str, ",%s,");
+    sprintf(name_str, "%s,");
+    int   name_len    = strlen(name);
+    int   dbg_len     = strlen(dbg_str);
+    int   has_astrick = 0;
+    
+    for (int i = 0, ln = strlen(dbg_str); i < ln; i++) {
+        if (dbg_str[i] == '*') {
+            if (dbg_str[i + 1] == '*')
+                has_astrick = 2;
+            else if (has_astrick == 0)
+                has_astrick = 1;
+        }
+        if (strncmp(&dbg_str[i], name, name_len + 1) == 0) {
+            if (i == 0 || dbg_str[i - 1] != '-')
+                return true;
+            else
+                return false;
+        }
+    }
+    return has_astrick > 1 || 
+           has_astrick == (int)(is_remote != false);
 }
 
 none sync_tokens(tapestry t, path build_path, string name) {
@@ -58,16 +81,16 @@ none import_init(import im) {
     path   cwd     = path_cwd(4096);
     path   install = im->tapestry->install;
     path   src     = im->tapestry->src;
-    bool   debug      = is_debug(im->tapestry, im->name);
-    symbol build_type = debug ? "debug" : "release";
+    bool   is_remote = true;
     path checkout     = f(path, "%o/checkout", install);
     im->import_path   = f(path, "%o/%o", checkout, im->name);
-    im->build_path    = f(path, "%o/%s", im->import_path, build_type);
+    
     if (!dir_exists("%o/%o", checkout, im->name)) {
         cd(checkout);
         if (A_len(src) && dir_exists("%o/%o", src, im->name)) {
             verify (exec("ln -s %o/%o %o/%o",
                 src, im->name, checkout, im->name) == 0, "symlink");
+            is_remote = false;
         } else {
             exec("rm -rf %o", im->name);
             int clone = exec("git clone %o %o --no-checkout && cd %o && git checkout %o && cd ..",
@@ -80,6 +103,9 @@ none import_init(import im) {
             }
         }
     }
+    im->debug = is_dbg(im->tapestry, im->name, is_remote);
+    symbol build_type = im->debug ? "debug" : "release";
+    im->build_path    = f(path, "%o/%s", im->import_path, build_type);
     string n = im->name;
     i32* c = null, *b = null, *i = null;
     if (file_exists("%o/build", im->import_path)) {
@@ -155,7 +181,7 @@ none add_flag(tapestry a, array list, line l, map environment) {
     }
 }
 
-none tapestry_with_map(tapestry a, map m) {
+tapestry tapestry_with_map(tapestry a, map m) {
     tapestry parent       = get(m, string("parent"));
     path af               = get(m, string("path"));
     a->m                  = hold(m);
@@ -165,7 +191,7 @@ none tapestry_with_map(tapestry a, map m) {
     a->imports            = array(64);
     a->project_path       = directory(af);
     a->name               = filename(a->project_path);
-    cstr build_dir        = is_debug(a, a->name) ? "debug" : "release";
+    cstr build_dir        = is_dbg(a, a->name, false) ? "debug" : "release";
     a->build_path         = form(path, "%o/%s", a->project_path, build_dir);
     a->exports            = array(64);
     a->interns            = array(64);
@@ -293,6 +319,7 @@ none tapestry_with_map(tapestry a, map m) {
             A_initialize(im);
         }
     }
+    return a;
 }
 
 string import_cmake_location(import im) {
@@ -311,7 +338,6 @@ bool import_make(import im) {
     tapestry t = im->tapestry;
     path install = t->install;
     i64 conf_status = INT64_MIN;
-    bool debug      = is_debug(t, im->name);
     path t0 = form(path, "tapestry-token");
     path t1 = form(path, "%o/tokens/%o", install, im->name);
     path checkout = form(path, "%o/checkout", install);
@@ -346,18 +372,18 @@ bool import_make(import im) {
 
     string cmake_conf = cmake_location(im);
     string args = cast(string, im);
-    cstr debug_r = debug ? "debug" : "release";
+    cstr debug_r = im->debug ? "debug" : "release";
     setenv("BUILD_CONFIG", args->chars, 1);
     setenv("BUILD_TYPE", debug_r, 1);
 
     if (file_exists("../Cargo.toml")) {
         // todo: copy bin/lib after
         verify(exec("cargo build --%s --manifest-path ../Cargo.toml --target-dir .",
-            debug ? "debug" : "release") == 0, "rust compilation");
+            im->debug ? "debug" : "release") == 0, "rust compilation");
     } else if (cmake_conf || file_exists("../CMakeLists.txt")) {
         /// configure
         if (!file_exists("CMakeCache.txt")) {
-            cstr build = debug ? "Debug" : "Release";
+            cstr build = im->debug ? "Debug" : "Release";
             int  iconf = exec(
                 "cmake -B . -S .. -DCMAKE_INSTALL_PREFIX=%o -DCMAKE_BUILD_TYPE=%s %o", install, build, im);
             verify(iconf == 0, "%o: configure failed", im->name);
@@ -390,7 +416,7 @@ bool import_make(import im) {
                     verify(exec("%o %s%s --prefix=%o %o",
                         env,
                         configure,
-                        debug ? " --enable-debug" : "",
+                        im->debug ? " --enable-debug" : "",
                         install,
                         im) == 0, configure);
                 }
@@ -402,11 +428,6 @@ bool import_make(import im) {
         }
     }
     return true;
-}
-
-static bool is_dbg(cstr name) {
-    cstr dbg = getenv("DBG");
-    return dbg ? strstr(dbg, name) != 0 : false;
 }
 
 static array headers(path dir) {
@@ -504,10 +525,19 @@ none cflags_libs(tapestry a, string* cflags, string* libs) {
     }
 }
 
+bool is_checkout(path a) {
+    path par = parent(a);
+    string st = stem(par);
+    if (eq(st, "checkout")) {
+        return true;
+    }
+    return false;
+}
+
 // build with optional bc path; if no bc path we use the project file system
 i32 tapestry_build(tapestry a, path bc) {
     int  error_code = 0;
-    bool debug = is_dbg(cstring(a->name));
+    bool debug = is_dbg(a, a->project_path, false);
 
     if (bc) {
         // simplified process for .bc case
