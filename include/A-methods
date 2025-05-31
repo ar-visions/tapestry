@@ -112,20 +112,24 @@
 #define contains(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->contains(_i_, ## __VA_ARGS__); })
 #undef clear
 #define clear(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->clear(_i_, ## __VA_ARGS__); })
-#undef clear
-#define clear(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->clear(_i_, ## __VA_ARGS__); })
 #undef set
 #define set(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->set(_i_, ## __VA_ARGS__); })
+#undef get
+#define get(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->get(_i_, ## __VA_ARGS__); })
 #undef lookup
 #define lookup(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->lookup(_i_, ## __VA_ARGS__); })
 #undef fetch
 #define fetch(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->fetch(_i_, ## __VA_ARGS__); })
 #undef rm
 #define rm(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->rm(_i_, ## __VA_ARGS__); })
+#undef rm_item
+#define rm_item(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->rm_item(_i_, ## __VA_ARGS__); })
 #undef contains
 #define contains(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->contains(_i_, ## __VA_ARGS__); })
 #undef concat
 #define concat(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->concat(_i_, ## __VA_ARGS__); })
+#undef clear
+#define clear(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->clear(_i_, ## __VA_ARGS__); })
 #undef len
 #define len(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->len(_i_, ## __VA_ARGS__); })
 #undef call

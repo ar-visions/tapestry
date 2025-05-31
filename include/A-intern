@@ -24,8 +24,8 @@
 #define AF_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef hashmap_intern
 #define hashmap_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
-#undef pair_intern
-#define pair_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
+#undef map_intern
+#define map_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef fn_intern
 #define fn_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef string_intern
@@ -43,8 +43,6 @@
 
 #undef ATypes_intern
 #define ATypes_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
-#undef map_intern
-#define map_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef path_intern
 #define path_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef array_string_intern

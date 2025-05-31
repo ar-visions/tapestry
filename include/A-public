@@ -35,8 +35,8 @@
 #ifndef hashmap_intern
 #define hashmap_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
-#ifndef pair_intern
-#define pair_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
+#ifndef map_intern
+#define map_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
 #ifndef fn_intern
 #define fn_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
@@ -62,9 +62,6 @@
 
 #ifndef ATypes_intern
 #define ATypes_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
-#endif
-#ifndef map_intern
-#define map_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
 #ifndef path_intern
 #define path_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)

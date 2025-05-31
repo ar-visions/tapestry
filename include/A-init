@@ -326,33 +326,6 @@
     A_initialize((object)instance); \
     instance; \
 })
-#define TC_pair(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(pair, MEMBER); VALUE; })
-#define _ARG_COUNT_IMPL_pair(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
-#define _ARG_COUNT_I_pair(...) _ARG_COUNT_IMPL_pair(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-#define _ARG_COUNT_pair(...)   _ARG_COUNT_I_pair("A-type", ## __VA_ARGS__)
-#define _COMBINE_pair_(A, B)   A##B
-#define _COMBINE_pair(A, B)    _COMBINE_pair_(A, B)
-#define _N_ARGS_pair_0( TYPE)
-#define _N_ARGS_pair_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
-#define _N_ARGS_pair_2( TYPE, a,b) instance->a = TC_pair(a,b);
-#define _N_ARGS_pair_4( TYPE, a,b, c,d) _N_ARGS_pair_2(TYPE, a,b) instance->c = TC_pair(c,d);
-#define _N_ARGS_pair_6( TYPE, a,b, c,d, e,f) _N_ARGS_pair_4(TYPE, a,b, c,d) instance->e = TC_pair(e,f);
-#define _N_ARGS_pair_8( TYPE, a,b, c,d, e,f, g,h) _N_ARGS_pair_6(TYPE, a,b, c,d, e,f) instance->g = TC_pair(g,h);
-#define _N_ARGS_pair_10(TYPE, a,b, c,d, e,f, g,h, i,j) _N_ARGS_pair_8(TYPE, a,b, c,d, e,f, g,h) instance->i = TC_pair(i,j);
-#define _N_ARGS_pair_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) _N_ARGS_pair_10(TYPE, a,b, c,d, e,f, g,h, i,j) instance->l = TC_pair(l,m);
-#define _N_ARGS_pair_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) _N_ARGS_pair_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) instance->n = TC_pair(n,o);
-#define _N_ARGS_pair_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) _N_ARGS_pair_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) instance->p = TC_pair(p,q);
-#define _N_ARGS_pair_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) _N_ARGS_pair_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) instance->r = TC_pair(r,s);
-#define _N_ARGS_pair_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) _N_ARGS_pair_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) instance->t = TC_pair(t,u);
-#define _N_ARGS_pair_22(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u, v,w) _N_ARGS_pair_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) instance->v = TC_pair(v,w);
-#define _N_ARGS_HELPER2_pair(TYPE, N, ...)  _COMBINE_pair(_N_ARGS_pair_, N)(TYPE, ## __VA_ARGS__)
-#define _N_ARGS_pair(TYPE,...)    _N_ARGS_HELPER2_pair(TYPE, _ARG_COUNT_pair(__VA_ARGS__), ## __VA_ARGS__)
-#define pair(...) ({ \
-    pair instance = (pair)A_alloc(typeid(pair), 1, true); \
-    _N_ARGS_pair(pair, ## __VA_ARGS__); \
-    A_initialize((object)instance); \
-    instance; \
-})
 #define TC_map(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(map, MEMBER); VALUE; })
 #define _ARG_COUNT_IMPL_map(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
 #define _ARG_COUNT_I_map(...) _ARG_COUNT_IMPL_map(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
