@@ -24,7 +24,7 @@
 #define _N_ARGS_HELPER2_item(TYPE, N, ...)  _COMBINE_item(_N_ARGS_item_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_item(TYPE,...)    _N_ARGS_HELPER2_item(TYPE, _ARG_COUNT_item(__VA_ARGS__), ## __VA_ARGS__)
 #define item(...) ({ \
-    item instance = (item)A_alloc(typeid(item), 1, true); \
+    item instance = (item)A_alloc_dbg(typeid(item), 1, true, __FILE__, __LINE__); \
     _N_ARGS_item(item, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -51,7 +51,7 @@
 #define _N_ARGS_HELPER2_message(TYPE, N, ...)  _COMBINE_message(_N_ARGS_message_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_message(TYPE,...)    _N_ARGS_HELPER2_message(TYPE, _ARG_COUNT_message(__VA_ARGS__), ## __VA_ARGS__)
 #define message(...) ({ \
-    message instance = (message)A_alloc(typeid(message), 1, true); \
+    message instance = (message)A_alloc_dbg(typeid(message), 1, true, __FILE__, __LINE__); \
     _N_ARGS_message(message, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -78,7 +78,7 @@
 #define _N_ARGS_HELPER2_list(TYPE, N, ...)  _COMBINE_list(_N_ARGS_list_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_list(TYPE,...)    _N_ARGS_HELPER2_list(TYPE, _ARG_COUNT_list(__VA_ARGS__), ## __VA_ARGS__)
 #define list(...) ({ \
-    list instance = (list)A_alloc(typeid(list), 1, true); \
+    list instance = (list)A_alloc_dbg(typeid(list), 1, true, __FILE__, __LINE__); \
     _N_ARGS_list(list, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -105,7 +105,7 @@
 #define _N_ARGS_HELPER2_buffer(TYPE, N, ...)  _COMBINE_buffer(_N_ARGS_buffer_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_buffer(TYPE,...)    _N_ARGS_HELPER2_buffer(TYPE, _ARG_COUNT_buffer(__VA_ARGS__), ## __VA_ARGS__)
 #define buffer(...) ({ \
-    buffer instance = (buffer)A_alloc(typeid(buffer), 1, true); \
+    buffer instance = (buffer)A_alloc_dbg(typeid(buffer), 1, true, __FILE__, __LINE__); \
     _N_ARGS_buffer(buffer, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -132,7 +132,7 @@
 #define _N_ARGS_HELPER2_file(TYPE, N, ...)  _COMBINE_file(_N_ARGS_file_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_file(TYPE,...)    _N_ARGS_HELPER2_file(TYPE, _ARG_COUNT_file(__VA_ARGS__), ## __VA_ARGS__)
 #define file(...) ({ \
-    file instance = (file)A_alloc(typeid(file), 1, true); \
+    file instance = (file)A_alloc_dbg(typeid(file), 1, true, __FILE__, __LINE__); \
     _N_ARGS_file(file, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -159,7 +159,7 @@
 #define _N_ARGS_HELPER2_shape(TYPE, N, ...)  _COMBINE_shape(_N_ARGS_shape_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_shape(TYPE,...)    _N_ARGS_HELPER2_shape(TYPE, _ARG_COUNT_shape(__VA_ARGS__), ## __VA_ARGS__)
 #define shape(...) ({ \
-    shape instance = (shape)A_alloc(typeid(shape), 1, true); \
+    shape instance = (shape)A_alloc_dbg(typeid(shape), 1, true, __FILE__, __LINE__); \
     _N_ARGS_shape(shape, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -186,7 +186,7 @@
 #define _N_ARGS_HELPER2_vector(TYPE, N, ...)  _COMBINE_vector(_N_ARGS_vector_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_vector(TYPE,...)    _N_ARGS_HELPER2_vector(TYPE, _ARG_COUNT_vector(__VA_ARGS__), ## __VA_ARGS__)
 #define vector(...) ({ \
-    vector instance = (vector)A_alloc(typeid(vector), 1, true); \
+    vector instance = (vector)A_alloc_dbg(typeid(vector), 1, true, __FILE__, __LINE__); \
     _N_ARGS_vector(vector, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -213,7 +213,7 @@
 #define _N_ARGS_HELPER2_subprocedure(TYPE, N, ...)  _COMBINE_subprocedure(_N_ARGS_subprocedure_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_subprocedure(TYPE,...)    _N_ARGS_HELPER2_subprocedure(TYPE, _ARG_COUNT_subprocedure(__VA_ARGS__), ## __VA_ARGS__)
 #define subprocedure(...) ({ \
-    subprocedure instance = (subprocedure)A_alloc(typeid(subprocedure), 1, true); \
+    subprocedure instance = (subprocedure)A_alloc_dbg(typeid(subprocedure), 1, true, __FILE__, __LINE__); \
     _N_ARGS_subprocedure(subprocedure, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -240,7 +240,7 @@
 #define _N_ARGS_HELPER2_array(TYPE, N, ...)  _COMBINE_array(_N_ARGS_array_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_array(TYPE,...)    _N_ARGS_HELPER2_array(TYPE, _ARG_COUNT_array(__VA_ARGS__), ## __VA_ARGS__)
 #define array(...) ({ \
-    array instance = (array)A_alloc(typeid(array), 1, true); \
+    array instance = (array)A_alloc_dbg(typeid(array), 1, true, __FILE__, __LINE__); \
     _N_ARGS_array(array, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -267,7 +267,7 @@
 #define _N_ARGS_HELPER2_ATypes(TYPE, N, ...)  _COMBINE_ATypes(_N_ARGS_ATypes_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_ATypes(TYPE,...)    _N_ARGS_HELPER2_ATypes(TYPE, _ARG_COUNT_ATypes(__VA_ARGS__), ## __VA_ARGS__)
 #define ATypes(...) ({ \
-    ATypes instance = (ATypes)A_alloc(typeid(ATypes), 1, true); \
+    ATypes instance = (ATypes)A_alloc_dbg(typeid(ATypes), 1, true, __FILE__, __LINE__); \
     _N_ARGS_ATypes(ATypes, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -294,7 +294,7 @@
 #define _N_ARGS_HELPER2_AF(TYPE, N, ...)  _COMBINE_AF(_N_ARGS_AF_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_AF(TYPE,...)    _N_ARGS_HELPER2_AF(TYPE, _ARG_COUNT_AF(__VA_ARGS__), ## __VA_ARGS__)
 #define AF(...) ({ \
-    AF instance = (AF)A_alloc(typeid(AF), 1, true); \
+    AF instance = (AF)A_alloc_dbg(typeid(AF), 1, true, __FILE__, __LINE__); \
     _N_ARGS_AF(AF, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -321,7 +321,7 @@
 #define _N_ARGS_HELPER2_hashmap(TYPE, N, ...)  _COMBINE_hashmap(_N_ARGS_hashmap_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_hashmap(TYPE,...)    _N_ARGS_HELPER2_hashmap(TYPE, _ARG_COUNT_hashmap(__VA_ARGS__), ## __VA_ARGS__)
 #define hashmap(...) ({ \
-    hashmap instance = (hashmap)A_alloc(typeid(hashmap), 1, true); \
+    hashmap instance = (hashmap)A_alloc_dbg(typeid(hashmap), 1, true, __FILE__, __LINE__); \
     _N_ARGS_hashmap(hashmap, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -348,7 +348,7 @@
 #define _N_ARGS_HELPER2_map(TYPE, N, ...)  _COMBINE_map(_N_ARGS_map_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_map(TYPE,...)    _N_ARGS_HELPER2_map(TYPE, _ARG_COUNT_map(__VA_ARGS__), ## __VA_ARGS__)
 #define map(...) ({ \
-    map instance = (map)A_alloc(typeid(map), 1, true); \
+    map instance = (map)A_alloc_dbg(typeid(map), 1, true, __FILE__, __LINE__); \
     _N_ARGS_map(map, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -375,7 +375,7 @@
 #define _N_ARGS_HELPER2_fn(TYPE, N, ...)  _COMBINE_fn(_N_ARGS_fn_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_fn(TYPE,...)    _N_ARGS_HELPER2_fn(TYPE, _ARG_COUNT_fn(__VA_ARGS__), ## __VA_ARGS__)
 #define fn(...) ({ \
-    fn instance = (fn)A_alloc(typeid(fn), 1, true); \
+    fn instance = (fn)A_alloc_dbg(typeid(fn), 1, true, __FILE__, __LINE__); \
     _N_ARGS_fn(fn, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -402,7 +402,7 @@
 #define _N_ARGS_HELPER2_string(TYPE, N, ...)  _COMBINE_string(_N_ARGS_string_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_string(TYPE,...)    _N_ARGS_HELPER2_string(TYPE, _ARG_COUNT_string(__VA_ARGS__), ## __VA_ARGS__)
 #define string(...) ({ \
-    string instance = (string)A_alloc(typeid(string), 1, true); \
+    string instance = (string)A_alloc_dbg(typeid(string), 1, true, __FILE__, __LINE__); \
     _N_ARGS_string(string, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -429,7 +429,7 @@
 #define _N_ARGS_HELPER2_watch(TYPE, N, ...)  _COMBINE_watch(_N_ARGS_watch_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_watch(TYPE,...)    _N_ARGS_HELPER2_watch(TYPE, _ARG_COUNT_watch(__VA_ARGS__), ## __VA_ARGS__)
 #define watch(...) ({ \
-    watch instance = (watch)A_alloc(typeid(watch), 1, true); \
+    watch instance = (watch)A_alloc_dbg(typeid(watch), 1, true, __FILE__, __LINE__); \
     _N_ARGS_watch(watch, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -456,7 +456,7 @@
 #define _N_ARGS_HELPER2_unit(TYPE, N, ...)  _COMBINE_unit(_N_ARGS_unit_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_unit(TYPE,...)    _N_ARGS_HELPER2_unit(TYPE, _ARG_COUNT_unit(__VA_ARGS__), ## __VA_ARGS__)
 #define unit(...) ({ \
-    unit instance = (unit)A_alloc(typeid(unit), 1, true); \
+    unit instance = (unit)A_alloc_dbg(typeid(unit), 1, true, __FILE__, __LINE__); \
     _N_ARGS_unit(unit, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -483,7 +483,7 @@
 #define _N_ARGS_HELPER2_mutex(TYPE, N, ...)  _COMBINE_mutex(_N_ARGS_mutex_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_mutex(TYPE,...)    _N_ARGS_HELPER2_mutex(TYPE, _ARG_COUNT_mutex(__VA_ARGS__), ## __VA_ARGS__)
 #define mutex(...) ({ \
-    mutex instance = (mutex)A_alloc(typeid(mutex), 1, true); \
+    mutex instance = (mutex)A_alloc_dbg(typeid(mutex), 1, true, __FILE__, __LINE__); \
     _N_ARGS_mutex(mutex, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -510,7 +510,7 @@
 #define _N_ARGS_HELPER2_async(TYPE, N, ...)  _COMBINE_async(_N_ARGS_async_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_async(TYPE,...)    _N_ARGS_HELPER2_async(TYPE, _ARG_COUNT_async(__VA_ARGS__), ## __VA_ARGS__)
 #define async(...) ({ \
-    async instance = (async)A_alloc(typeid(async), 1, true); \
+    async instance = (async)A_alloc_dbg(typeid(async), 1, true, __FILE__, __LINE__); \
     _N_ARGS_async(async, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -537,7 +537,7 @@
 #define _N_ARGS_HELPER2_path(TYPE, N, ...)  _COMBINE_path(_N_ARGS_path_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_path(TYPE,...)    _N_ARGS_HELPER2_path(TYPE, _ARG_COUNT_path(__VA_ARGS__), ## __VA_ARGS__)
 #define path(...) ({ \
-    path instance = (path)A_alloc(typeid(path), 1, true); \
+    path instance = (path)A_alloc_dbg(typeid(path), 1, true, __FILE__, __LINE__); \
     _N_ARGS_path(path, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -564,7 +564,7 @@
 #define _N_ARGS_HELPER2_line(TYPE, N, ...)  _COMBINE_line(_N_ARGS_line_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_line(TYPE,...)    _N_ARGS_HELPER2_line(TYPE, _ARG_COUNT_line(__VA_ARGS__), ## __VA_ARGS__)
 #define line(...) ({ \
-    line instance = (line)A_alloc(typeid(line), 1, true); \
+    line instance = (line)A_alloc_dbg(typeid(line), 1, true, __FILE__, __LINE__); \
     _N_ARGS_line(line, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -591,7 +591,7 @@
 #define _N_ARGS_HELPER2_array_string(TYPE, N, ...)  _COMBINE_array_string(_N_ARGS_array_string_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_array_string(TYPE,...)    _N_ARGS_HELPER2_array_string(TYPE, _ARG_COUNT_array_string(__VA_ARGS__), ## __VA_ARGS__)
 #define array_string(...) ({ \
-    array_string instance = (array_string)A_alloc(typeid(array_string), 1, true); \
+    array_string instance = (array_string)A_alloc_dbg(typeid(array_string), 1, true, __FILE__, __LINE__); \
     _N_ARGS_array_string(array_string, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -618,7 +618,7 @@
 #define _N_ARGS_HELPER2_array_map(TYPE, N, ...)  _COMBINE_array_map(_N_ARGS_array_map_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_array_map(TYPE,...)    _N_ARGS_HELPER2_array_map(TYPE, _ARG_COUNT_array_map(__VA_ARGS__), ## __VA_ARGS__)
 #define array_map(...) ({ \
-    array_map instance = (array_map)A_alloc(typeid(array_map), 1, true); \
+    array_map instance = (array_map)A_alloc_dbg(typeid(array_map), 1, true, __FILE__, __LINE__); \
     _N_ARGS_array_map(array_map, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
