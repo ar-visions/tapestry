@@ -37,7 +37,7 @@ int main(int argc, cstr argv[]) {
     
     verify(stat(rpath, &bin_stat) == 0, "stat failed on self");
     
-    A_start();
+    A_start(argc, argv);
 
     signal(SIGINT,  on_signal);  // ctrl+c
     signal(SIGTERM, on_signal);  // kill

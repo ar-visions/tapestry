@@ -534,6 +534,34 @@ bool is_checkout(path a) {
     return false;
 }
 
+none tapestry_link_shares(tapestry a, path project_from) {
+    if (!dir_exists("%o/share", project_from))
+        return;
+    // if this is debug, we want to rsync everything
+    path import_share = f(path, "%o/share", project_from);
+    array dir = ls(import_share, null, false); // no pattern, and recursion set
+    each (dir, path, share_folder) {
+        // verify that its indeed a folder, and not a file resource (not supported at root level)
+        verify(is_dir(share_folder), "unsupported file structure");
+        string rtype = filename(share_folder);
+        array rfiles = ls(share_folder, null, false);
+
+        path rtype_dir  = f(path, "%o/share/%o/%o", a->install, a->name, rtype);
+        make_dir(rtype_dir);
+
+        each (rfiles, path, res) {
+            // create symlink at dest  install/share/our-target-name/each-resource-dir/each-file -> im->import_path/share/each-resource-dir/each-resource-file
+            string fn = filename(res);
+            path src  = f(path, "%o/share/%o/%o", project_from, rtype, fn);
+            path dest = f(path, "%o/share/%o/%o/%o", a->install, a->name, rtype, fn);
+            exec("rm -rf %o", dest);
+            verify(!file_exists("%o", dest), "cannot create symlink");
+            exec("ln -s %o %o", src, dest);
+            verify(file_exists("%o", dest), "symlink creation failure");
+        }
+    }
+}
+
 // build with optional bc path; if no bc path we use the project file system
 i32 tapestry_build(tapestry a, path bc) {
     int  error_code = 0;
@@ -720,24 +748,15 @@ i32 tapestry_build(tapestry a, path bc) {
         }
     }
     
-    each (a->imports, import, im) {
-        if (!dir_exists("%o/share", im->import_path))
-            continue;
-        verify (exec("rsync -a %o/share/ %o/share/%o",
-            im->import_path, a->install, a->name) == 0,
-                "import resources");
-    }
+    // for each import with a share folder in its repo, symlink all files individually (cannot use folders safely because our targets stack resources)
+    each (a->imports, import, im)
+        tapestry_link_shares(a, im->import_path);
 
-    /// an app could perhaps initialize its own installation in a post-install -- fetching resources etc
-    if (dir_exists("%o/share", a->project_path)) {
-        verify (exec("rsync -a %o/share/ %o/share/%o/", a->project_path, a->install, a->name) == 0,
-            "project resources");
-    }
+    tapestry_link_shares(a, a->project_path);
 
     /// now we set the token here! (we do this twice; the import layer does it 
     // (and CAN be skipped if its a tapestry project -- should be without side effect, though, since its immediately after))
     sync_tokens(a, a->build_path, a->name);
-
     return error_code;
 }
 
