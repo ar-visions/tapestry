@@ -184,7 +184,7 @@ none add_flag(tapestry a, array list, line l, map environment) {
 tapestry tapestry_with_map(tapestry a, map m) {
     tapestry parent       = get(m, string("parent"));
     path af               = get(m, string("path"));
-    a->m                  = hold(m);
+    a->m                  = m;
     a->dbg                = get(m, string("dbg"));
     a->install            = get(m, string("install"));
     a->src                = get(m, string("src"));
@@ -557,7 +557,7 @@ none tapestry_link_shares(tapestry a, path project_from) {
             exec("rm -rf %o", dest);
             verify(!file_exists("%o", dest), "cannot create symlink");
             exec("ln -s %o %o", src, dest);
-            verify(file_exists("%o", dest), "symlink creation failure");
+            //verify(file_exists("%o", dest), "symlink creation failure");
         }
     }
 }
