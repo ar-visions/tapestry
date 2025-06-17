@@ -18,6 +18,8 @@
 #define data_type(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->data_type(_i_, ## __VA_ARGS__); })
 #undef data_stride
 #define data_stride(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->data_stride(_i_, ## __VA_ARGS__); })
+#undef bind
+#define bind(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->bind(_i_, ## __VA_ARGS__); })
 #undef pop
 #define pop(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->pop(_i_, ## __VA_ARGS__); })
 #undef push
@@ -200,6 +202,10 @@
 #define sync(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->sync(_i_, ## __VA_ARGS__); })
 #undef exists
 #define exists(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->exists(_i_, ## __VA_ARGS__); })
+#undef is_symlink
+#define is_symlink(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->is_symlink(_i_, ## __VA_ARGS__); })
+#undef resolve
+#define resolve(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->resolve(_i_, ## __VA_ARGS__); })
 #undef make_dir
 #define make_dir(I,...) ({ __typeof__(I) _i_ = I; ftableI(_i_)->make_dir(_i_, ## __VA_ARGS__); })
 #undef is_ext

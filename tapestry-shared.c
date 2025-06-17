@@ -79,7 +79,7 @@ none sync_tokens(tapestry t, path build_path, string name) {
 
 none import_init(import im) {
     path   cwd     = path_cwd(4096);
-    path   install = im->tapestry->install;
+    path   install = copy(im->tapestry->install);
     path   src     = im->tapestry->src;
     bool   is_remote = true;
     path checkout     = f(path, "%o/checkout", install);
@@ -184,10 +184,10 @@ none add_flag(tapestry a, array list, line l, map environment) {
 tapestry tapestry_with_map(tapestry a, map m) {
     tapestry parent       = get(m, string("parent"));
     path af               = get(m, string("path"));
-    a->m                  = m;
-    a->dbg                = get(m, string("dbg"));
-    a->install            = get(m, string("install"));
-    a->src                = get(m, string("src"));
+    a->m                  = hold(m);
+    a->dbg                = hold(get(m, string("dbg")));
+    a->install            = hold(get(m, string("install")));
+    a->src                = hold(get(m, string("src")));
     a->imports            = array(64);
     a->project_path       = directory(af);
     a->name               = filename(a->project_path);
@@ -262,8 +262,7 @@ tapestry tapestry_with_map(tapestry a, map m) {
                         uri,    uri,
                         commit, commit,
                         environment, map(),
-                        config, array(64), commands, array(16), always, array(16)); // we must initialize this
-                    // we need to create this complete!
+                        config, array(64), commands, array(16), always, array(16));
                     push(a->imports, im);
                 }
 
@@ -336,7 +335,7 @@ string import_cmake_location(import im) {
 /// handle autoconfig (if present) and resultant / static Makefile
 bool import_make(import im) {
     tapestry t = im->tapestry;
-    path install = t->install;
+    path install = copy(t->install);
     i64 conf_status = INT64_MIN;
     path t0 = form(path, "tapestry-token");
     path t1 = form(path, "%o/tokens/%o", install, im->name);
@@ -438,6 +437,7 @@ static array headers(path dir) {
         if (len(e) == 0 || cmp(e, ".h") == 0)
             push(res, f);
     }
+    drop(all);
     return res;
 }
 
@@ -453,6 +453,10 @@ static int filename_index(array files, path f) {
     return -1;
 }
 
+static bool sync_symlink(path src, path dst) {
+
+}
+
 /// install headers, then overlay built headers; then install libs and app targets
 i32 tapestry_install(tapestry a) {
     path   install      = a->install;
@@ -464,19 +468,47 @@ i32 tapestry_install(tapestry a) {
     array  project_h   = headers(project_lib);
     array  build_h     = headers(build_lib);
 
-    each(project_h, path, f)
-        if (filename_index(build_h, f) < 0)
-            exec("rsync -a %o %o/", f, install_inc);
+    each(project_h, path, f) {
+        string fname = filename(f);
+        if (filename_index(build_h, f) < 0) {
+            path dst = f(path, "%o/%o", install_inc, fname);
+            if (!eq(f, dst)) {
+                exec("rm -rf %o",   dst);
+                exec("ln -s %o %o", f, dst);
+            }
+            //exec("rsync -a %o %o/", f, install_inc);
+        }
+    }
 
-    each (build_h, path, f)
-        if (!eq(filename(f), "import"))
-            exec("rsync -a %o %o/", f, install_inc);
+    each (build_h, path, f) {
+        string  fname = filename(f);
+        if (!eq(fname, "import")) {
+            path dst = f(path, "%o/%o", install_inc, fname);
+            if (!eq(f, dst)) {
+                exec("rm -rf %o",   dst);
+                exec("ln -s %o %o", f, dst);
+            }
+            //exec("rsync -a %o %o/", f, install_inc);
+        }
+    }
 
-    each(a->lib_targets, path, lib)
-        exec("rsync -a %o %o/%o", lib, install_lib, filename(lib));
+    each(a->lib_targets, path, lib) {
+        path dst = f(path, "%o/%o", install_lib, filename(lib));
+        if (!eq(lib, dst)) {
+            exec("rm -rf %o",   dst);
+            exec("ln -s %o %o", lib, dst);
+        }
+        //exec("rsync -a %o %o/%o", lib, install_lib, filename(lib));
+    }
 
-    each(a->app_targets, path, app)
-        exec("rsync -a %o %o/%o", app, install_app, filename(app));
+    each(a->app_targets, path, app) {
+        path dst = f(path, "%o/%o", install_app, filename(app));
+        if (!eq(app, dst)) {
+            exec("rm -rf %o",   dst);
+            exec("ln -s %o %o", app, dst);
+        }
+        //exec("rsync -a %o %o/%o", app, install_app, filename(app));
+    }
 
     return 0;
 }
@@ -525,7 +557,7 @@ none cflags_libs(tapestry a, string* cflags, string* libs) {
     }
 }
 
-bool is_checkout(path a) {
+static bool is_checkout(path a) {
     path par = parent(a);
     string st = stem(par);
     if (eq(st, "checkout")) {
@@ -533,6 +565,8 @@ bool is_checkout(path a) {
     }
     return false;
 }
+
+
 
 none tapestry_link_shares(tapestry a, path project_from) {
     if (!dir_exists("%o/share", project_from))
@@ -552,12 +586,14 @@ none tapestry_link_shares(tapestry a, path project_from) {
         each (rfiles, path, res) {
             // create symlink at dest  install/share/our-target-name/each-resource-dir/each-file -> im->import_path/share/each-resource-dir/each-resource-file
             string fn = filename(res);
-            path src  = f(path, "%o/share/%o/%o", project_from, rtype, fn);
-            path dest = f(path, "%o/share/%o/%o/%o", a->install, a->name, rtype, fn);
-            exec("rm -rf %o", dest);
-            verify(!file_exists("%o", dest), "cannot create symlink");
-            exec("ln -s %o %o", src, dest);
-            //verify(file_exists("%o", dest), "symlink creation failure");
+            path src = f(path, "%o/share/%o/%o", project_from, rtype, fn);
+            path dst = f(path, "%o/share/%o/%o/%o", a->install, a->name, rtype, fn);
+            bool needs_link = !eq(src, dst);
+            if (needs_link) {
+                exec("rm -rf %o", dst);
+                verify(!file_exists("%o", dst), "cannot create symlink");
+                exec("ln -s %o %o", src, dst);
+            }
         }
     }
 }
@@ -679,7 +715,7 @@ i32 tapestry_build(tapestry a, path bc) {
             struct lang* lang = &langs[l];
             if (!lang->std) continue;
             string compiler = form(string, "%s -c %s-std=%s %s %o %o -I%o -I%o -I%o -I%o",
-                lang->compiler, debug ? "-g2 " : "", lang->std,
+                lang->compiler, debug ? "-g2 -fsanitize=address " : "", lang->std,
                 l == 0 ? CFLAGS : CFLAGS, /// CFLAGS from env come first
                 base_cflags,
                 l == 0 ? cflags : cflags, /// ... then project-based flags
@@ -712,7 +748,8 @@ i32 tapestry_build(tapestry a, path bc) {
         // link
         string lflags = string(alloc, 64);
         //concat(lflags, form(string, "-L%o/lib ", a->build_path));
-        concat(lflags, form(string, "-L%o/lib -Wl,-rpath,%o/lib", a->install, a->install));
+        concat(lflags, form(string, "-L%o/lib -Wl,-rpath,%o/lib%s", a->install, a->install,
+            debug ? " -fsanitize=address " : ""));
 
         if (is_lib) {
             path output_lib = form(path, "%o/lib/%s%o%s", a->build_path, lib_pre, n2, lib_ext);
@@ -723,7 +760,14 @@ i32 tapestry_build(tapestry a, path bc) {
                     lflags, base_libs, obj, output_lib) == 0, "linking");
             }
             // install lib right away
-            exec("rsync -a %o %o", output_lib, install_lib);
+            if (true || debug) {
+                if (!eq(output_lib, install_lib)) {
+                    exec("rm -rf %o",   install_lib);
+                    exec("ln -s %o %o", output_lib, install_lib);
+                }
+            } else
+                exec("rsync -a %o %o", output_lib, install_lib);
+            
             //push(a->lib_targets, output_lib);
         } else {
             each (obj_c, path, obj) {
@@ -735,6 +779,9 @@ i32 tapestry_build(tapestry a, path bc) {
                 }
                 if (is_app)
                     push(a->app_targets, output);
+                else
+                    drop(output);
+                drop(module_name);
             }
             each (obj_cc, path, obj) {
                 string module_name = stem(obj);
@@ -743,6 +790,8 @@ i32 tapestry_build(tapestry a, path bc) {
                     verify (exec("%s %o %o %o -o %o",
                         CXX, lflags, obj, output_o) == 0, "linking");
                 }
+                drop(module_name);
+                drop(output_o);
             }
             // run test here, to verify prior to install; will need updated PATH so they may run the apps we built just prior to test
         }

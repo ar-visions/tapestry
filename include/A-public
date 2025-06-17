@@ -29,9 +29,6 @@
 #ifndef array_intern
 #define array_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif
-#ifndef AF_intern
-#define AF_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
-#endif
 #ifndef hashmap_intern
 #define hashmap_intern(AA,YY,...) AA##_schema(AA,YY##_EXTERN, __VA_ARGS__)
 #endif

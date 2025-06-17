@@ -9,7 +9,7 @@
 #define _COMBINE_item_(A, B)   A##B
 #define _COMBINE_item(A, B)    _COMBINE_item_(A, B)
 #define _N_ARGS_item_0( TYPE)
-#define _N_ARGS_item_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_item_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_item_2( TYPE, a,b) instance->a = TC_item(a,b);
 #define _N_ARGS_item_4( TYPE, a,b, c,d) _N_ARGS_item_2(TYPE, a,b) instance->c = TC_item(c,d);
 #define _N_ARGS_item_6( TYPE, a,b, c,d, e,f) _N_ARGS_item_4(TYPE, a,b, c,d) instance->e = TC_item(e,f);
@@ -24,7 +24,7 @@
 #define _N_ARGS_HELPER2_item(TYPE, N, ...)  _COMBINE_item(_N_ARGS_item_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_item(TYPE,...)    _N_ARGS_HELPER2_item(TYPE, _ARG_COUNT_item(__VA_ARGS__), ## __VA_ARGS__)
 #define item(...) ({ \
-    item instance = (item)A_alloc_dbg(typeid(item), 1, true, __FILE__, __LINE__); \
+    item instance = (item)A_alloc_dbg(typeid(item), 1, __FILE__, __LINE__); \
     _N_ARGS_item(item, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -36,7 +36,7 @@
 #define _COMBINE_message_(A, B)   A##B
 #define _COMBINE_message(A, B)    _COMBINE_message_(A, B)
 #define _N_ARGS_message_0( TYPE)
-#define _N_ARGS_message_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_message_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_message_2( TYPE, a,b) instance->a = TC_message(a,b);
 #define _N_ARGS_message_4( TYPE, a,b, c,d) _N_ARGS_message_2(TYPE, a,b) instance->c = TC_message(c,d);
 #define _N_ARGS_message_6( TYPE, a,b, c,d, e,f) _N_ARGS_message_4(TYPE, a,b, c,d) instance->e = TC_message(e,f);
@@ -51,7 +51,7 @@
 #define _N_ARGS_HELPER2_message(TYPE, N, ...)  _COMBINE_message(_N_ARGS_message_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_message(TYPE,...)    _N_ARGS_HELPER2_message(TYPE, _ARG_COUNT_message(__VA_ARGS__), ## __VA_ARGS__)
 #define message(...) ({ \
-    message instance = (message)A_alloc_dbg(typeid(message), 1, true, __FILE__, __LINE__); \
+    message instance = (message)A_alloc_dbg(typeid(message), 1, __FILE__, __LINE__); \
     _N_ARGS_message(message, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -63,7 +63,7 @@
 #define _COMBINE_list_(A, B)   A##B
 #define _COMBINE_list(A, B)    _COMBINE_list_(A, B)
 #define _N_ARGS_list_0( TYPE)
-#define _N_ARGS_list_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_list_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_list_2( TYPE, a,b) instance->a = TC_list(a,b);
 #define _N_ARGS_list_4( TYPE, a,b, c,d) _N_ARGS_list_2(TYPE, a,b) instance->c = TC_list(c,d);
 #define _N_ARGS_list_6( TYPE, a,b, c,d, e,f) _N_ARGS_list_4(TYPE, a,b, c,d) instance->e = TC_list(e,f);
@@ -78,7 +78,7 @@
 #define _N_ARGS_HELPER2_list(TYPE, N, ...)  _COMBINE_list(_N_ARGS_list_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_list(TYPE,...)    _N_ARGS_HELPER2_list(TYPE, _ARG_COUNT_list(__VA_ARGS__), ## __VA_ARGS__)
 #define list(...) ({ \
-    list instance = (list)A_alloc_dbg(typeid(list), 1, true, __FILE__, __LINE__); \
+    list instance = (list)A_alloc_dbg(typeid(list), 1, __FILE__, __LINE__); \
     _N_ARGS_list(list, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -90,7 +90,7 @@
 #define _COMBINE_buffer_(A, B)   A##B
 #define _COMBINE_buffer(A, B)    _COMBINE_buffer_(A, B)
 #define _N_ARGS_buffer_0( TYPE)
-#define _N_ARGS_buffer_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_buffer_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_buffer_2( TYPE, a,b) instance->a = TC_buffer(a,b);
 #define _N_ARGS_buffer_4( TYPE, a,b, c,d) _N_ARGS_buffer_2(TYPE, a,b) instance->c = TC_buffer(c,d);
 #define _N_ARGS_buffer_6( TYPE, a,b, c,d, e,f) _N_ARGS_buffer_4(TYPE, a,b, c,d) instance->e = TC_buffer(e,f);
@@ -105,7 +105,7 @@
 #define _N_ARGS_HELPER2_buffer(TYPE, N, ...)  _COMBINE_buffer(_N_ARGS_buffer_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_buffer(TYPE,...)    _N_ARGS_HELPER2_buffer(TYPE, _ARG_COUNT_buffer(__VA_ARGS__), ## __VA_ARGS__)
 #define buffer(...) ({ \
-    buffer instance = (buffer)A_alloc_dbg(typeid(buffer), 1, true, __FILE__, __LINE__); \
+    buffer instance = (buffer)A_alloc_dbg(typeid(buffer), 1, __FILE__, __LINE__); \
     _N_ARGS_buffer(buffer, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -117,7 +117,7 @@
 #define _COMBINE_file_(A, B)   A##B
 #define _COMBINE_file(A, B)    _COMBINE_file_(A, B)
 #define _N_ARGS_file_0( TYPE)
-#define _N_ARGS_file_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_file_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_file_2( TYPE, a,b) instance->a = TC_file(a,b);
 #define _N_ARGS_file_4( TYPE, a,b, c,d) _N_ARGS_file_2(TYPE, a,b) instance->c = TC_file(c,d);
 #define _N_ARGS_file_6( TYPE, a,b, c,d, e,f) _N_ARGS_file_4(TYPE, a,b, c,d) instance->e = TC_file(e,f);
@@ -132,7 +132,7 @@
 #define _N_ARGS_HELPER2_file(TYPE, N, ...)  _COMBINE_file(_N_ARGS_file_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_file(TYPE,...)    _N_ARGS_HELPER2_file(TYPE, _ARG_COUNT_file(__VA_ARGS__), ## __VA_ARGS__)
 #define file(...) ({ \
-    file instance = (file)A_alloc_dbg(typeid(file), 1, true, __FILE__, __LINE__); \
+    file instance = (file)A_alloc_dbg(typeid(file), 1, __FILE__, __LINE__); \
     _N_ARGS_file(file, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -144,7 +144,7 @@
 #define _COMBINE_shape_(A, B)   A##B
 #define _COMBINE_shape(A, B)    _COMBINE_shape_(A, B)
 #define _N_ARGS_shape_0( TYPE)
-#define _N_ARGS_shape_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_shape_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_shape_2( TYPE, a,b) instance->a = TC_shape(a,b);
 #define _N_ARGS_shape_4( TYPE, a,b, c,d) _N_ARGS_shape_2(TYPE, a,b) instance->c = TC_shape(c,d);
 #define _N_ARGS_shape_6( TYPE, a,b, c,d, e,f) _N_ARGS_shape_4(TYPE, a,b, c,d) instance->e = TC_shape(e,f);
@@ -159,7 +159,7 @@
 #define _N_ARGS_HELPER2_shape(TYPE, N, ...)  _COMBINE_shape(_N_ARGS_shape_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_shape(TYPE,...)    _N_ARGS_HELPER2_shape(TYPE, _ARG_COUNT_shape(__VA_ARGS__), ## __VA_ARGS__)
 #define shape(...) ({ \
-    shape instance = (shape)A_alloc_dbg(typeid(shape), 1, true, __FILE__, __LINE__); \
+    shape instance = (shape)A_alloc_dbg(typeid(shape), 1, __FILE__, __LINE__); \
     _N_ARGS_shape(shape, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -171,7 +171,7 @@
 #define _COMBINE_vector_(A, B)   A##B
 #define _COMBINE_vector(A, B)    _COMBINE_vector_(A, B)
 #define _N_ARGS_vector_0( TYPE)
-#define _N_ARGS_vector_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_vector_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_vector_2( TYPE, a,b) instance->a = TC_vector(a,b);
 #define _N_ARGS_vector_4( TYPE, a,b, c,d) _N_ARGS_vector_2(TYPE, a,b) instance->c = TC_vector(c,d);
 #define _N_ARGS_vector_6( TYPE, a,b, c,d, e,f) _N_ARGS_vector_4(TYPE, a,b, c,d) instance->e = TC_vector(e,f);
@@ -186,7 +186,7 @@
 #define _N_ARGS_HELPER2_vector(TYPE, N, ...)  _COMBINE_vector(_N_ARGS_vector_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_vector(TYPE,...)    _N_ARGS_HELPER2_vector(TYPE, _ARG_COUNT_vector(__VA_ARGS__), ## __VA_ARGS__)
 #define vector(...) ({ \
-    vector instance = (vector)A_alloc_dbg(typeid(vector), 1, true, __FILE__, __LINE__); \
+    vector instance = (vector)A_alloc_dbg(typeid(vector), 1, __FILE__, __LINE__); \
     _N_ARGS_vector(vector, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -198,7 +198,7 @@
 #define _COMBINE_subprocedure_(A, B)   A##B
 #define _COMBINE_subprocedure(A, B)    _COMBINE_subprocedure_(A, B)
 #define _N_ARGS_subprocedure_0( TYPE)
-#define _N_ARGS_subprocedure_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_subprocedure_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_subprocedure_2( TYPE, a,b) instance->a = TC_subprocedure(a,b);
 #define _N_ARGS_subprocedure_4( TYPE, a,b, c,d) _N_ARGS_subprocedure_2(TYPE, a,b) instance->c = TC_subprocedure(c,d);
 #define _N_ARGS_subprocedure_6( TYPE, a,b, c,d, e,f) _N_ARGS_subprocedure_4(TYPE, a,b, c,d) instance->e = TC_subprocedure(e,f);
@@ -213,7 +213,7 @@
 #define _N_ARGS_HELPER2_subprocedure(TYPE, N, ...)  _COMBINE_subprocedure(_N_ARGS_subprocedure_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_subprocedure(TYPE,...)    _N_ARGS_HELPER2_subprocedure(TYPE, _ARG_COUNT_subprocedure(__VA_ARGS__), ## __VA_ARGS__)
 #define subprocedure(...) ({ \
-    subprocedure instance = (subprocedure)A_alloc_dbg(typeid(subprocedure), 1, true, __FILE__, __LINE__); \
+    subprocedure instance = (subprocedure)A_alloc_dbg(typeid(subprocedure), 1, __FILE__, __LINE__); \
     _N_ARGS_subprocedure(subprocedure, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -225,7 +225,7 @@
 #define _COMBINE_array_(A, B)   A##B
 #define _COMBINE_array(A, B)    _COMBINE_array_(A, B)
 #define _N_ARGS_array_0( TYPE)
-#define _N_ARGS_array_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_array_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_array_2( TYPE, a,b) instance->a = TC_array(a,b);
 #define _N_ARGS_array_4( TYPE, a,b, c,d) _N_ARGS_array_2(TYPE, a,b) instance->c = TC_array(c,d);
 #define _N_ARGS_array_6( TYPE, a,b, c,d, e,f) _N_ARGS_array_4(TYPE, a,b, c,d) instance->e = TC_array(e,f);
@@ -240,7 +240,7 @@
 #define _N_ARGS_HELPER2_array(TYPE, N, ...)  _COMBINE_array(_N_ARGS_array_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_array(TYPE,...)    _N_ARGS_HELPER2_array(TYPE, _ARG_COUNT_array(__VA_ARGS__), ## __VA_ARGS__)
 #define array(...) ({ \
-    array instance = (array)A_alloc_dbg(typeid(array), 1, true, __FILE__, __LINE__); \
+    array instance = (array)A_alloc_dbg(typeid(array), 1, __FILE__, __LINE__); \
     _N_ARGS_array(array, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -252,7 +252,7 @@
 #define _COMBINE_ATypes_(A, B)   A##B
 #define _COMBINE_ATypes(A, B)    _COMBINE_ATypes_(A, B)
 #define _N_ARGS_ATypes_0( TYPE)
-#define _N_ARGS_ATypes_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_ATypes_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_ATypes_2( TYPE, a,b) instance->a = TC_ATypes(a,b);
 #define _N_ARGS_ATypes_4( TYPE, a,b, c,d) _N_ARGS_ATypes_2(TYPE, a,b) instance->c = TC_ATypes(c,d);
 #define _N_ARGS_ATypes_6( TYPE, a,b, c,d, e,f) _N_ARGS_ATypes_4(TYPE, a,b, c,d) instance->e = TC_ATypes(e,f);
@@ -267,35 +267,8 @@
 #define _N_ARGS_HELPER2_ATypes(TYPE, N, ...)  _COMBINE_ATypes(_N_ARGS_ATypes_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_ATypes(TYPE,...)    _N_ARGS_HELPER2_ATypes(TYPE, _ARG_COUNT_ATypes(__VA_ARGS__), ## __VA_ARGS__)
 #define ATypes(...) ({ \
-    ATypes instance = (ATypes)A_alloc_dbg(typeid(ATypes), 1, true, __FILE__, __LINE__); \
+    ATypes instance = (ATypes)A_alloc_dbg(typeid(ATypes), 1, __FILE__, __LINE__); \
     _N_ARGS_ATypes(ATypes, ## __VA_ARGS__); \
-    A_initialize((object)instance); \
-    instance; \
-})
-#define TC_AF(MEMBER, VALUE) ({ (*(u128*)&instance->f) |= ((u128)1) << FIELD_ID(AF, MEMBER); VALUE; })
-#define _ARG_COUNT_IMPL_AF(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, N, ...) N
-#define _ARG_COUNT_I_AF(...) _ARG_COUNT_IMPL_AF(__VA_ARGS__, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-#define _ARG_COUNT_AF(...)   _ARG_COUNT_I_AF("A-type", ## __VA_ARGS__)
-#define _COMBINE_AF_(A, B)   A##B
-#define _COMBINE_AF(A, B)    _COMBINE_AF_(A, B)
-#define _N_ARGS_AF_0( TYPE)
-#define _N_ARGS_AF_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
-#define _N_ARGS_AF_2( TYPE, a,b) instance->a = TC_AF(a,b);
-#define _N_ARGS_AF_4( TYPE, a,b, c,d) _N_ARGS_AF_2(TYPE, a,b) instance->c = TC_AF(c,d);
-#define _N_ARGS_AF_6( TYPE, a,b, c,d, e,f) _N_ARGS_AF_4(TYPE, a,b, c,d) instance->e = TC_AF(e,f);
-#define _N_ARGS_AF_8( TYPE, a,b, c,d, e,f, g,h) _N_ARGS_AF_6(TYPE, a,b, c,d, e,f) instance->g = TC_AF(g,h);
-#define _N_ARGS_AF_10(TYPE, a,b, c,d, e,f, g,h, i,j) _N_ARGS_AF_8(TYPE, a,b, c,d, e,f, g,h) instance->i = TC_AF(i,j);
-#define _N_ARGS_AF_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) _N_ARGS_AF_10(TYPE, a,b, c,d, e,f, g,h, i,j) instance->l = TC_AF(l,m);
-#define _N_ARGS_AF_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) _N_ARGS_AF_12(TYPE, a,b, c,d, e,f, g,h, i,j, l,m) instance->n = TC_AF(n,o);
-#define _N_ARGS_AF_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) _N_ARGS_AF_14(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o) instance->p = TC_AF(p,q);
-#define _N_ARGS_AF_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) _N_ARGS_AF_16(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q) instance->r = TC_AF(r,s);
-#define _N_ARGS_AF_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) _N_ARGS_AF_18(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s) instance->t = TC_AF(t,u);
-#define _N_ARGS_AF_22(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u, v,w) _N_ARGS_AF_20(TYPE, a,b, c,d, e,f, g,h, i,j, l,m, n,o, p,q, r,s, t,u) instance->v = TC_AF(v,w);
-#define _N_ARGS_HELPER2_AF(TYPE, N, ...)  _COMBINE_AF(_N_ARGS_AF_, N)(TYPE, ## __VA_ARGS__)
-#define _N_ARGS_AF(TYPE,...)    _N_ARGS_HELPER2_AF(TYPE, _ARG_COUNT_AF(__VA_ARGS__), ## __VA_ARGS__)
-#define AF(...) ({ \
-    AF instance = (AF)A_alloc_dbg(typeid(AF), 1, true, __FILE__, __LINE__); \
-    _N_ARGS_AF(AF, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
 })
@@ -306,7 +279,7 @@
 #define _COMBINE_hashmap_(A, B)   A##B
 #define _COMBINE_hashmap(A, B)    _COMBINE_hashmap_(A, B)
 #define _N_ARGS_hashmap_0( TYPE)
-#define _N_ARGS_hashmap_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_hashmap_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_hashmap_2( TYPE, a,b) instance->a = TC_hashmap(a,b);
 #define _N_ARGS_hashmap_4( TYPE, a,b, c,d) _N_ARGS_hashmap_2(TYPE, a,b) instance->c = TC_hashmap(c,d);
 #define _N_ARGS_hashmap_6( TYPE, a,b, c,d, e,f) _N_ARGS_hashmap_4(TYPE, a,b, c,d) instance->e = TC_hashmap(e,f);
@@ -321,7 +294,7 @@
 #define _N_ARGS_HELPER2_hashmap(TYPE, N, ...)  _COMBINE_hashmap(_N_ARGS_hashmap_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_hashmap(TYPE,...)    _N_ARGS_HELPER2_hashmap(TYPE, _ARG_COUNT_hashmap(__VA_ARGS__), ## __VA_ARGS__)
 #define hashmap(...) ({ \
-    hashmap instance = (hashmap)A_alloc_dbg(typeid(hashmap), 1, true, __FILE__, __LINE__); \
+    hashmap instance = (hashmap)A_alloc_dbg(typeid(hashmap), 1, __FILE__, __LINE__); \
     _N_ARGS_hashmap(hashmap, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -333,7 +306,7 @@
 #define _COMBINE_map_(A, B)   A##B
 #define _COMBINE_map(A, B)    _COMBINE_map_(A, B)
 #define _N_ARGS_map_0( TYPE)
-#define _N_ARGS_map_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_map_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_map_2( TYPE, a,b) instance->a = TC_map(a,b);
 #define _N_ARGS_map_4( TYPE, a,b, c,d) _N_ARGS_map_2(TYPE, a,b) instance->c = TC_map(c,d);
 #define _N_ARGS_map_6( TYPE, a,b, c,d, e,f) _N_ARGS_map_4(TYPE, a,b, c,d) instance->e = TC_map(e,f);
@@ -348,7 +321,7 @@
 #define _N_ARGS_HELPER2_map(TYPE, N, ...)  _COMBINE_map(_N_ARGS_map_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_map(TYPE,...)    _N_ARGS_HELPER2_map(TYPE, _ARG_COUNT_map(__VA_ARGS__), ## __VA_ARGS__)
 #define map(...) ({ \
-    map instance = (map)A_alloc_dbg(typeid(map), 1, true, __FILE__, __LINE__); \
+    map instance = (map)A_alloc_dbg(typeid(map), 1, __FILE__, __LINE__); \
     _N_ARGS_map(map, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -360,7 +333,7 @@
 #define _COMBINE_fn_(A, B)   A##B
 #define _COMBINE_fn(A, B)    _COMBINE_fn_(A, B)
 #define _N_ARGS_fn_0( TYPE)
-#define _N_ARGS_fn_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_fn_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_fn_2( TYPE, a,b) instance->a = TC_fn(a,b);
 #define _N_ARGS_fn_4( TYPE, a,b, c,d) _N_ARGS_fn_2(TYPE, a,b) instance->c = TC_fn(c,d);
 #define _N_ARGS_fn_6( TYPE, a,b, c,d, e,f) _N_ARGS_fn_4(TYPE, a,b, c,d) instance->e = TC_fn(e,f);
@@ -375,7 +348,7 @@
 #define _N_ARGS_HELPER2_fn(TYPE, N, ...)  _COMBINE_fn(_N_ARGS_fn_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_fn(TYPE,...)    _N_ARGS_HELPER2_fn(TYPE, _ARG_COUNT_fn(__VA_ARGS__), ## __VA_ARGS__)
 #define fn(...) ({ \
-    fn instance = (fn)A_alloc_dbg(typeid(fn), 1, true, __FILE__, __LINE__); \
+    fn instance = (fn)A_alloc_dbg(typeid(fn), 1, __FILE__, __LINE__); \
     _N_ARGS_fn(fn, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -387,7 +360,7 @@
 #define _COMBINE_string_(A, B)   A##B
 #define _COMBINE_string(A, B)    _COMBINE_string_(A, B)
 #define _N_ARGS_string_0( TYPE)
-#define _N_ARGS_string_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_string_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_string_2( TYPE, a,b) instance->a = TC_string(a,b);
 #define _N_ARGS_string_4( TYPE, a,b, c,d) _N_ARGS_string_2(TYPE, a,b) instance->c = TC_string(c,d);
 #define _N_ARGS_string_6( TYPE, a,b, c,d, e,f) _N_ARGS_string_4(TYPE, a,b, c,d) instance->e = TC_string(e,f);
@@ -402,7 +375,7 @@
 #define _N_ARGS_HELPER2_string(TYPE, N, ...)  _COMBINE_string(_N_ARGS_string_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_string(TYPE,...)    _N_ARGS_HELPER2_string(TYPE, _ARG_COUNT_string(__VA_ARGS__), ## __VA_ARGS__)
 #define string(...) ({ \
-    string instance = (string)A_alloc_dbg(typeid(string), 1, true, __FILE__, __LINE__); \
+    string instance = (string)A_alloc_dbg(typeid(string), 1, __FILE__, __LINE__); \
     _N_ARGS_string(string, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -414,7 +387,7 @@
 #define _COMBINE_watch_(A, B)   A##B
 #define _COMBINE_watch(A, B)    _COMBINE_watch_(A, B)
 #define _N_ARGS_watch_0( TYPE)
-#define _N_ARGS_watch_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_watch_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_watch_2( TYPE, a,b) instance->a = TC_watch(a,b);
 #define _N_ARGS_watch_4( TYPE, a,b, c,d) _N_ARGS_watch_2(TYPE, a,b) instance->c = TC_watch(c,d);
 #define _N_ARGS_watch_6( TYPE, a,b, c,d, e,f) _N_ARGS_watch_4(TYPE, a,b, c,d) instance->e = TC_watch(e,f);
@@ -429,7 +402,7 @@
 #define _N_ARGS_HELPER2_watch(TYPE, N, ...)  _COMBINE_watch(_N_ARGS_watch_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_watch(TYPE,...)    _N_ARGS_HELPER2_watch(TYPE, _ARG_COUNT_watch(__VA_ARGS__), ## __VA_ARGS__)
 #define watch(...) ({ \
-    watch instance = (watch)A_alloc_dbg(typeid(watch), 1, true, __FILE__, __LINE__); \
+    watch instance = (watch)A_alloc_dbg(typeid(watch), 1, __FILE__, __LINE__); \
     _N_ARGS_watch(watch, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -441,7 +414,7 @@
 #define _COMBINE_unit_(A, B)   A##B
 #define _COMBINE_unit(A, B)    _COMBINE_unit_(A, B)
 #define _N_ARGS_unit_0( TYPE)
-#define _N_ARGS_unit_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_unit_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_unit_2( TYPE, a,b) instance->a = TC_unit(a,b);
 #define _N_ARGS_unit_4( TYPE, a,b, c,d) _N_ARGS_unit_2(TYPE, a,b) instance->c = TC_unit(c,d);
 #define _N_ARGS_unit_6( TYPE, a,b, c,d, e,f) _N_ARGS_unit_4(TYPE, a,b, c,d) instance->e = TC_unit(e,f);
@@ -456,7 +429,7 @@
 #define _N_ARGS_HELPER2_unit(TYPE, N, ...)  _COMBINE_unit(_N_ARGS_unit_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_unit(TYPE,...)    _N_ARGS_HELPER2_unit(TYPE, _ARG_COUNT_unit(__VA_ARGS__), ## __VA_ARGS__)
 #define unit(...) ({ \
-    unit instance = (unit)A_alloc_dbg(typeid(unit), 1, true, __FILE__, __LINE__); \
+    unit instance = (unit)A_alloc_dbg(typeid(unit), 1, __FILE__, __LINE__); \
     _N_ARGS_unit(unit, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -468,7 +441,7 @@
 #define _COMBINE_mutex_(A, B)   A##B
 #define _COMBINE_mutex(A, B)    _COMBINE_mutex_(A, B)
 #define _N_ARGS_mutex_0( TYPE)
-#define _N_ARGS_mutex_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_mutex_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_mutex_2( TYPE, a,b) instance->a = TC_mutex(a,b);
 #define _N_ARGS_mutex_4( TYPE, a,b, c,d) _N_ARGS_mutex_2(TYPE, a,b) instance->c = TC_mutex(c,d);
 #define _N_ARGS_mutex_6( TYPE, a,b, c,d, e,f) _N_ARGS_mutex_4(TYPE, a,b, c,d) instance->e = TC_mutex(e,f);
@@ -483,7 +456,7 @@
 #define _N_ARGS_HELPER2_mutex(TYPE, N, ...)  _COMBINE_mutex(_N_ARGS_mutex_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_mutex(TYPE,...)    _N_ARGS_HELPER2_mutex(TYPE, _ARG_COUNT_mutex(__VA_ARGS__), ## __VA_ARGS__)
 #define mutex(...) ({ \
-    mutex instance = (mutex)A_alloc_dbg(typeid(mutex), 1, true, __FILE__, __LINE__); \
+    mutex instance = (mutex)A_alloc_dbg(typeid(mutex), 1, __FILE__, __LINE__); \
     _N_ARGS_mutex(mutex, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -495,7 +468,7 @@
 #define _COMBINE_async_(A, B)   A##B
 #define _COMBINE_async(A, B)    _COMBINE_async_(A, B)
 #define _N_ARGS_async_0( TYPE)
-#define _N_ARGS_async_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_async_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_async_2( TYPE, a,b) instance->a = TC_async(a,b);
 #define _N_ARGS_async_4( TYPE, a,b, c,d) _N_ARGS_async_2(TYPE, a,b) instance->c = TC_async(c,d);
 #define _N_ARGS_async_6( TYPE, a,b, c,d, e,f) _N_ARGS_async_4(TYPE, a,b, c,d) instance->e = TC_async(e,f);
@@ -510,7 +483,7 @@
 #define _N_ARGS_HELPER2_async(TYPE, N, ...)  _COMBINE_async(_N_ARGS_async_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_async(TYPE,...)    _N_ARGS_HELPER2_async(TYPE, _ARG_COUNT_async(__VA_ARGS__), ## __VA_ARGS__)
 #define async(...) ({ \
-    async instance = (async)A_alloc_dbg(typeid(async), 1, true, __FILE__, __LINE__); \
+    async instance = (async)A_alloc_dbg(typeid(async), 1, __FILE__, __LINE__); \
     _N_ARGS_async(async, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -522,7 +495,7 @@
 #define _COMBINE_path_(A, B)   A##B
 #define _COMBINE_path(A, B)    _COMBINE_path_(A, B)
 #define _N_ARGS_path_0( TYPE)
-#define _N_ARGS_path_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_path_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_path_2( TYPE, a,b) instance->a = TC_path(a,b);
 #define _N_ARGS_path_4( TYPE, a,b, c,d) _N_ARGS_path_2(TYPE, a,b) instance->c = TC_path(c,d);
 #define _N_ARGS_path_6( TYPE, a,b, c,d, e,f) _N_ARGS_path_4(TYPE, a,b, c,d) instance->e = TC_path(e,f);
@@ -537,7 +510,7 @@
 #define _N_ARGS_HELPER2_path(TYPE, N, ...)  _COMBINE_path(_N_ARGS_path_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_path(TYPE,...)    _N_ARGS_HELPER2_path(TYPE, _ARG_COUNT_path(__VA_ARGS__), ## __VA_ARGS__)
 #define path(...) ({ \
-    path instance = (path)A_alloc_dbg(typeid(path), 1, true, __FILE__, __LINE__); \
+    path instance = (path)A_alloc_dbg(typeid(path), 1, __FILE__, __LINE__); \
     _N_ARGS_path(path, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -549,7 +522,7 @@
 #define _COMBINE_line_(A, B)   A##B
 #define _COMBINE_line(A, B)    _COMBINE_line_(A, B)
 #define _N_ARGS_line_0( TYPE)
-#define _N_ARGS_line_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_line_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_line_2( TYPE, a,b) instance->a = TC_line(a,b);
 #define _N_ARGS_line_4( TYPE, a,b, c,d) _N_ARGS_line_2(TYPE, a,b) instance->c = TC_line(c,d);
 #define _N_ARGS_line_6( TYPE, a,b, c,d, e,f) _N_ARGS_line_4(TYPE, a,b, c,d) instance->e = TC_line(e,f);
@@ -564,7 +537,7 @@
 #define _N_ARGS_HELPER2_line(TYPE, N, ...)  _COMBINE_line(_N_ARGS_line_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_line(TYPE,...)    _N_ARGS_HELPER2_line(TYPE, _ARG_COUNT_line(__VA_ARGS__), ## __VA_ARGS__)
 #define line(...) ({ \
-    line instance = (line)A_alloc_dbg(typeid(line), 1, true, __FILE__, __LINE__); \
+    line instance = (line)A_alloc_dbg(typeid(line), 1, __FILE__, __LINE__); \
     _N_ARGS_line(line, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -576,7 +549,7 @@
 #define _COMBINE_array_string_(A, B)   A##B
 #define _COMBINE_array_string(A, B)    _COMBINE_array_string_(A, B)
 #define _N_ARGS_array_string_0( TYPE)
-#define _N_ARGS_array_string_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_array_string_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_array_string_2( TYPE, a,b) instance->a = TC_array_string(a,b);
 #define _N_ARGS_array_string_4( TYPE, a,b, c,d) _N_ARGS_array_string_2(TYPE, a,b) instance->c = TC_array_string(c,d);
 #define _N_ARGS_array_string_6( TYPE, a,b, c,d, e,f) _N_ARGS_array_string_4(TYPE, a,b, c,d) instance->e = TC_array_string(e,f);
@@ -591,7 +564,7 @@
 #define _N_ARGS_HELPER2_array_string(TYPE, N, ...)  _COMBINE_array_string(_N_ARGS_array_string_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_array_string(TYPE,...)    _N_ARGS_HELPER2_array_string(TYPE, _ARG_COUNT_array_string(__VA_ARGS__), ## __VA_ARGS__)
 #define array_string(...) ({ \
-    array_string instance = (array_string)A_alloc_dbg(typeid(array_string), 1, true, __FILE__, __LINE__); \
+    array_string instance = (array_string)A_alloc_dbg(typeid(array_string), 1, __FILE__, __LINE__); \
     _N_ARGS_array_string(array_string, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \
@@ -603,7 +576,7 @@
 #define _COMBINE_array_map_(A, B)   A##B
 #define _COMBINE_array_map(A, B)    _COMBINE_array_map_(A, B)
 #define _N_ARGS_array_map_0( TYPE)
-#define _N_ARGS_array_map_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) const void *: (void)0)(instance, a)
+#define _N_ARGS_array_map_1( TYPE, a) _Generic((a), TYPE##_schema(TYPE, GENERICS, object) A_schema(A, GENERICS, object) const void *: (void)0)(instance, a)
 #define _N_ARGS_array_map_2( TYPE, a,b) instance->a = TC_array_map(a,b);
 #define _N_ARGS_array_map_4( TYPE, a,b, c,d) _N_ARGS_array_map_2(TYPE, a,b) instance->c = TC_array_map(c,d);
 #define _N_ARGS_array_map_6( TYPE, a,b, c,d, e,f) _N_ARGS_array_map_4(TYPE, a,b, c,d) instance->e = TC_array_map(e,f);
@@ -618,7 +591,7 @@
 #define _N_ARGS_HELPER2_array_map(TYPE, N, ...)  _COMBINE_array_map(_N_ARGS_array_map_, N)(TYPE, ## __VA_ARGS__)
 #define _N_ARGS_array_map(TYPE,...)    _N_ARGS_HELPER2_array_map(TYPE, _ARG_COUNT_array_map(__VA_ARGS__), ## __VA_ARGS__)
 #define array_map(...) ({ \
-    array_map instance = (array_map)A_alloc_dbg(typeid(array_map), 1, true, __FILE__, __LINE__); \
+    array_map instance = (array_map)A_alloc_dbg(typeid(array_map), 1, __FILE__, __LINE__); \
     _N_ARGS_array_map(array_map, ## __VA_ARGS__); \
     A_initialize((object)instance); \
     instance; \

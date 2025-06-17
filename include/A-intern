@@ -20,8 +20,6 @@
 #define subprocedure_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef array_intern
 #define array_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
-#undef AF_intern
-#define AF_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef hashmap_intern
 #define hashmap_intern(AA,YY,...) AA##_schema(AA,YY, __VA_ARGS__)
 #undef map_intern

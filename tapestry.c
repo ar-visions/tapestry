@@ -37,7 +37,7 @@ int main(int argc, cstr argv[]) {
     
     verify(stat(rpath, &bin_stat) == 0, "stat failed on self");
     
-    A_start(argc, argv);
+    A_start(argv);
 
     signal(SIGINT,  on_signal);  // ctrl+c
     signal(SIGTERM, on_signal);  // kill
@@ -51,7 +51,8 @@ int main(int argc, cstr argv[]) {
     for (int i = 0; i < sizeof(relics) / sizeof(char*); i++) {
         struct  stat src_stat;
         path relic_path = form(path, "%s/%s", _TAPESTRY, relics[i]);
-        if (stat(cstring(relic_path), &src_stat) == 0)
+        cstr rpath2 = cstring(relic_path);
+        if (stat(rpath2, &src_stat) == 0)
             if (src_mod > src_stat.st_mtime)
                 src_mod = src_stat.st_mtime;
     }
@@ -73,7 +74,7 @@ int main(int argc, cstr argv[]) {
     cstr  _DBG            = getenv("DBG");
     path  default_path    = form  (path, "%s", ".");
     path  default_install = form  (path, "%s", _TAPESTRY ? _TAPESTRY : ".");
-    map   args            = A_args(argc, argv,
+    map   args            = A_args(argv,
         "path",    default_path,
         "install", default_install,
         null);
