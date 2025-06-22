@@ -34,8 +34,8 @@ static bool is_dbg(tapestry t, cstr name, bool is_remote) {
     cstr  dbg = getenv("DBG");
     char  dbg_str[PATH_MAX];
     char name_str[PATH_MAX];
-    sprintf(dbg_str, ",%s,");
-    sprintf(name_str, "%s,");
+    sprintf(dbg_str, ",%s,", dbg);
+    sprintf(name_str, "%s,", name_str);
     int   name_len    = strlen(name);
     int   dbg_len     = strlen(dbg_str);
     int   has_astrick = 0;
@@ -47,15 +47,16 @@ static bool is_dbg(tapestry t, cstr name, bool is_remote) {
             else if (has_astrick == 0)
                 has_astrick = 1;
         }
-        if (strncmp(&dbg_str[i], name, name_len + 1) == 0) {
+        if (strncmp(&dbg_str[i], name, name_len) == 0) {
             if (i == 0 || dbg_str[i - 1] != '-')
                 return true;
             else
                 return false;
         }
     }
+    bool is_local = !is_remote;
     return has_astrick > 1 || 
-           has_astrick == (int)(is_remote != false);
+           has_astrick == (int)is_local;
 }
 
 none sync_tokens(tapestry t, path build_path, string name) {
@@ -81,7 +82,7 @@ none import_init(import im) {
     path   cwd     = path_cwd(4096);
     path   install = copy(im->tapestry->install);
     path   src     = im->tapestry->src;
-    bool   is_remote = true;
+    bool   is_remote = !dir_exists("%o/%o", src, im->name);
     path checkout     = f(path, "%o/checkout", install);
     im->import_path   = f(path, "%o/%o", checkout, im->name);
     
@@ -103,7 +104,7 @@ none import_init(import im) {
             }
         }
     }
-    im->debug = is_dbg(im->tapestry, im->name, is_remote);
+    im->debug = is_dbg(im->tapestry, (cstr)im->name->chars, is_remote);
     symbol build_type = im->debug ? "debug" : "release";
     im->build_path    = f(path, "%o/%s", im->import_path, build_type);
     string n = im->name;
@@ -191,7 +192,7 @@ tapestry tapestry_with_map(tapestry a, map m) {
     a->imports            = array(64);
     a->project_path       = directory(af);
     a->name               = filename(a->project_path);
-    cstr build_dir        = is_dbg(a, a->name, false) ? "debug" : "release";
+    cstr build_dir        = is_dbg(a, (cstr)a->name->chars, false) ? "debug" : "release";
     a->build_path         = form(path, "%o/%s", a->project_path, build_dir);
     a->exports            = array(64);
     a->interns            = array(64);
@@ -589,6 +590,7 @@ none tapestry_link_shares(tapestry a, path project_from) {
             path src = f(path, "%o/share/%o/%o", project_from, rtype, fn);
             path dst = f(path, "%o/share/%o/%o/%o", a->install, a->name, rtype, fn);
             bool needs_link = !eq(src, dst);
+            
             if (needs_link) {
                 exec("rm -rf %o", dst);
                 verify(!file_exists("%o", dst), "cannot create symlink");
@@ -601,7 +603,7 @@ none tapestry_link_shares(tapestry a, path project_from) {
 // build with optional bc path; if no bc path we use the project file system
 i32 tapestry_build(tapestry a, path bc) {
     int  error_code = 0;
-    bool debug = is_dbg(a, a->project_path, false);
+    bool debug = is_dbg(a, (cstr)a->name->chars, false);
 
     if (bc) {
         // simplified process for .bc case
