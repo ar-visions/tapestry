@@ -197,7 +197,7 @@ tapestry tapestry_with_map(tapestry a, map m) {
     a->exports            = array(64);
     a->interns            = array(64);
     a->environment        = map();
-    array  lines          = read(af, typeid(array));
+    array  lines          = read(af, typeid(array), null);
     import im             = null;
     string last_arch      = null;
     string last_platform  = null;
