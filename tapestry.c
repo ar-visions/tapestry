@@ -72,6 +72,7 @@ int main(int argc, cstr argv[]) {
     }
 
     cstr  _DBG            = getenv("DBG");
+    cstr  _ASAN           = getenv("ASAN");
     path  default_path    = form  (path, "%s", ".");
     path  default_install = form  (path, "%s", _TAPESTRY ? _TAPESTRY : ".");
     map   args            = A_args(argv,
@@ -107,6 +108,7 @@ int main(int argc, cstr argv[]) {
     path     af = absolute(f);
     map      m  = map_of(
         "path",    af,
+        "sanitize", _ASAN ? string(_ASAN) : string(""),
         "dbg",     _DBG ? string(_DBG) : string(""),
         "install", absolute(install_unrel),
         "src",     parent(install), null);

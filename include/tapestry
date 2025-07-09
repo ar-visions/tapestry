@@ -6,7 +6,7 @@ forward(tapestry)
 
 #define import_schema(X,Y,...) \
     i_prop(X,Y, public, tapestry, tapestry) \
-    i_prop(X,Y, public, array,  exports, of, flag) \
+    i_prop(X,Y, public, array,  exports, meta, flag) \
     i_prop(X,Y, public, string, name) \
     i_prop(X,Y, public, string, uri) \
     i_prop(X,Y, public, string, commit) \
@@ -16,9 +16,9 @@ forward(tapestry)
     i_method(X,Y, public, string, cmake_location) \
     i_method(X,Y, public, bool, make) \
     i_prop(X,Y, public, map,    environment) \
-    i_prop(X,Y, public, array, config,   of, string) \
-    i_prop(X,Y, public, array, commands, of, string) \
-    i_prop(X,Y, public, array, always,   of, string) \
+    i_prop(X,Y, public, array, config,   meta, string) \
+    i_prop(X,Y, public, array, commands, meta, string) \
+    i_prop(X,Y, public, array, always,   meta, string) \
     i_override(X,Y, cast, string) \
     i_override(X,Y, method, init)
 declare_class(import)
@@ -38,14 +38,15 @@ declare_class(flag)
     i_prop(X,Y, public, path,    src) \
     i_prop(X,Y, public, path,    install) \
     i_prop(X,Y, public, path,    include) \
+    i_prop(X,Y, public, string,  sanitize) \
     i_prop(X,Y, public, string,  dbg) \
     i_prop(X,Y, public, path,  project_path) \
     i_prop(X,Y, public, path,  build_path) \
-    i_prop(X,Y, public, array, imports, of, import) \
+    i_prop(X,Y, public, array, imports, meta, import) \
     i_prop(X,Y, intern, array, lib_targets) \
     i_prop(X,Y, intern, array, app_targets) \
-    i_prop(X,Y, public, array, exports, of, flag) \
-    i_prop(X,Y, public, array, interns, of, flag) \
+    i_prop(X,Y, public, array, exports, meta, flag) \
+    i_prop(X,Y, public, array, interns, meta, flag) \
     i_prop(X,Y, intern, map,   environment) \
     i_prop(X,Y, intern, bool,  has_lib) \
     i_method(X,Y, public, i32, build, path) \

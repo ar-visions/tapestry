@@ -30,8 +30,8 @@ static symbol lib_pre  = "";    static symbol lib_ext  = ".dll";    static symbo
 static symbol lib_pre  = "lib"; static symbol lib_ext  = ".dylib";  static symbol app_ext  = "";        static symbol platform = "darwin";
 #endif
 
-static bool is_dbg(tapestry t, cstr name, bool is_remote) {
-    cstr  dbg = getenv("DBG");
+static bool is_dbg(tapestry t, string query, cstr name, bool is_remote) {
+    cstr  dbg = (cstr)query->chars; // getenv("DBG");
     char  dbg_str[PATH_MAX];
     char name_str[PATH_MAX];
     sprintf(dbg_str, ",%s,", dbg);
@@ -56,7 +56,7 @@ static bool is_dbg(tapestry t, cstr name, bool is_remote) {
     }
     bool is_local = !is_remote;
     return has_astrick > 1 || 
-           has_astrick == (int)is_local;
+           (has_astrick && has_astrick == (int)is_local);
 }
 
 none sync_tokens(tapestry t, path build_path, string name) {
@@ -104,7 +104,7 @@ none import_init(import im) {
             }
         }
     }
-    im->debug = is_dbg(im->tapestry, (cstr)im->name->chars, is_remote);
+    im->debug = is_dbg(im->tapestry, im->tapestry->dbg, (cstr)im->name->chars, is_remote);
     symbol build_type = im->debug ? "debug" : "release";
     im->build_path    = f(path, "%o/%s", im->import_path, build_type);
     string n = im->name;
@@ -171,12 +171,22 @@ none add_flag(tapestry a, array list, line l, map environment) {
         string t = evaluate(w, environment); // PROJECT is missing null char
         if (len(t)) {
             //print("%o: %o", top_directive, t);
-            bool is_lib    = t->chars[0] == '-' && t->chars[1] == 'l';
-            bool is_cflag  = t->chars[0] == '-';
+            bool is_lib = false;
+            static cstr linker_labels[] = {
+                "-l", "--sysroot=", "-isystem ",
+                "-Wl,-rpath,", "-nodefaultlibs",
+                "-static"
+            };
+            for (int i = 0; i < sizeof(linker_labels) / sizeof(cstr); i++) {
+                if (starts_with(t, linker_labels[i])) {
+                    is_lib = true;
+                    break;
+                }
+            }
+            bool is_cflag  = !is_lib && t->chars[0] == '-';
             bool is_static = t->chars[0] == '@';
             push(list, flag(name,
-                    is_static ? mid(t, 1, len(t) - 1) : 
-                    is_lib    ? mid(t, 2, len(t) - 2) : t,
+                    is_static ? mid(t, 1, len(t) - 1) : t,
                 is_static, is_static, is_cflag, is_cflag, is_lib, is_lib));
         }
     }
@@ -187,17 +197,21 @@ tapestry tapestry_with_map(tapestry a, map m) {
     path af               = get(m, string("path"));
     a->m                  = hold(m);
     a->dbg                = hold(get(m, string("dbg")));
+    a->sanitize           = hold(get(m, string("sanitize")));
     a->install            = hold(get(m, string("install")));
     a->src                = hold(get(m, string("src")));
     a->imports            = array(64);
     a->project_path       = directory(af);
     a->name               = filename(a->project_path);
-    cstr build_dir        = is_dbg(a, (cstr)a->name->chars, false) ? "debug" : "release";
+    cstr build_dir        = is_dbg(a, a->dbg, (cstr)a->name->chars, false) ? "debug" : "release";
     a->build_path         = form(path, "%o/%s", a->project_path, build_dir);
     a->exports            = array(64);
     a->interns            = array(64);
-    a->environment        = map();
-    array  lines          = read(af, typeid(array), null);
+    a->environment        = map(assorted, true);
+    path build_file       = file_exists("%o", af) ? af :
+         (dir_exists("%o",  af) && file_exists("%o/build", af)) ? 
+        f(path, "%o/build", af) : null; 
+    array  lines          = build_file ? read(af, typeid(array), null) : null;
     import im             = null;
     string last_arch      = null;
     string last_platform  = null;
@@ -217,101 +231,104 @@ tapestry tapestry_with_map(tapestry a, map m) {
      
     map environment = parent ? parent->environment : a->environment;
 
-    each(lines, line, l) {
-        string first = get(l->text, 0);
-        i32    flen  = len(first);
+    if (lines)
+        each(lines, line, l) {
+            string first = get(l->text, 0);
+            i32    flen  = len(first);
+            
+            if (first(first) == '#') continue;
 
-        /// handle import/lib/app/test (must be indent 0)
-        if (l->indent == 0) {
-            verify(first->chars[flen - 1] == ':', "expected base-directive and ':'");
-            last_directive = mid(first, 0, flen - 1);
-            verify(cmp(last_directive, "import") == 0 ||
-                   cmp(last_directive, "export") == 0, "expected import or export directive");
-            is_import = cmp(last_directive, "import") == 0;
-            top_directive = copy(last_directive);
-            set(environment, string("DIRECTIVE"),
-                is_import ? string("lib") : 
-                (parent ? parent->has_lib : a->has_lib) ? string("lib") : // must be based on parent if set
-                            string("app"));
+            /// handle import/lib/app/test (must be indent 0)
+            if (l->indent == 0) {
+                verify(first->chars[flen - 1] == ':', "expected base-directive and ':'");
+                last_directive = mid(first, 0, flen - 1);
+                verify(cmp(last_directive, "import") == 0 ||
+                    cmp(last_directive, "export") == 0, "expected import or export directive");
+                is_import = cmp(last_directive, "import") == 0;
+                top_directive = copy(last_directive);
+                set(environment, string("DIRECTIVE"),
+                    is_import ? string("lib") : 
+                    (parent ? parent->has_lib : a->has_lib) ? string("lib") : // must be based on parent if set
+                                string("app"));
 
-        } else if (first->chars[flen - 1] == ':') {
-            /// independent of indent, up to user in how to construct
-            string n = mid(first, 0, flen - 1);
-            if (cmp(n, "linux") == 0 || cmp(n, "windows") == 0 || cmp(n, "darwin") == 0)
-                last_platform = n;
-            else
-                last_arch = n;
-        } else if (l->indent == 1) {
-            if (!parent) {
-                string text0 = get(l->text, 0);
-                string name   = evaluate(text0, environment);
-                if (name->chars[0] == '-') {
-                    /// we want our main target (lib or app, if isolated) to get these cflag or libs
-                    /// its the same as 'export' section, but not exported
-                    add_flag(a, a->interns, l, environment);
-                } else {
-                    verify(is_import, "expected import");
-                    string uri    = evaluate(get(l->text, 1), environment);
-                    string commit = evaluate(get(l->text, 2), environment);
-                    if (len(s_imports))
-                        append(s_imports, " ");
-                    concat(s_imports, name);
-                    /// currently its the headers.sh
-                    im = allocate(import,
-                        tapestry, a,
-                        name,   name,
-                        uri,    uri,
-                        commit, commit,
-                        environment, map(),
-                        config, array(64), commands, array(16), always, array(16));
-                    push(a->imports, im);
-                }
-
-                last_platform = null;
-                last_arch = null;
-            } else if (!is_import) {
-                add_flag(a, a->exports, l, environment);
-            }
-        } else if (!parent) {
-            if ((!last_platform || cmp(last_platform, platform) == 0) &&
-                (!last_arch     || cmp(last_arch,     arch)     == 0)) {
-                bool use_command = cmp(first, ">") == 0;
-                if (use_command || cmp(first, "!") == 0) {
-                    // combine tokens into singular string
-                    string cmd = string(alloc, 64);
-                    each(l->text, string, w) {
-                        if (first == w) continue;
-                        if (len(cmd))
-                            append(cmd, " ");
-                        concat(cmd, w);
+            } else if (first->chars[flen - 1] == ':') {
+                /// independent of indent, up to user in how to construct
+                string n = mid(first, 0, flen - 1);
+                if (cmp(n, "linux") == 0 || cmp(n, "windows") == 0 || cmp(n, "darwin") == 0)
+                    last_platform = n;
+                else
+                    last_arch = n;
+            } else if (l->indent == 1) {
+                if (!parent) {
+                    string text0 = get(l->text, 0);
+                    string name   = evaluate(text0, environment);
+                    if (name->chars[0] == '-') {
+                        /// we want our main target (lib or app, if isolated) to get these cflag or libs
+                        /// its the same as 'export' section, but not exported
+                        add_flag(a, a->interns, l, environment);
+                    } else {
+                        verify(is_import, "expected import");
+                        string uri    = evaluate(get(l->text, 1), environment);
+                        string commit = evaluate(get(l->text, 2), environment);
+                        if (len(s_imports))
+                            append(s_imports, " ");
+                        concat(s_imports, name);
+                        /// currently its the headers.sh
+                        im = allocate(import,
+                            tapestry, a,
+                            name,   name,
+                            uri,    uri,
+                            commit, commit,
+                            environment, map(),
+                            config, array(64), commands, array(16), always, array(16));
+                        push(a->imports, im);
                     }
-                    push(use_command ? im->commands : im->always, cmd);
-                } else {
-                    each(l->text, string, w) {
-                        /// if its VAR=VAL then this is not 'config' but rather environment
-                        char f = w->chars[0];
-                        cstr e = strstr(w->chars, "=");
-                        if (isalpha(f) && (f >= 'A' && f <= 'Z') && e) {
-                            char name[128];
-                            sz   ln = (sz)(e - w->chars);
-                            verify(ln < 128, "invalid data");
-                            memcpy(name, w->chars, ln);
-                            name[ln] = 0;
-                            char value[128];
-                            sz value_ln = len(w) - ln - 1;
-                            memcpy(value, &w->chars[ln + 1], value_ln);
-                            string n   = trim(string(name));
-                            string val = evaluate(string(value), environment);
-                            set(im->environment, n, val);
-                        } else {
-                            string e = evaluate(w, environment);
-                            push(im->config, e);
+
+                    last_platform = null;
+                    last_arch = null;
+                } else if (!is_import) {
+                    add_flag(a, a->exports, l, environment);
+                }
+            } else if (!parent) {
+                if ((!last_platform || cmp(last_platform, platform) == 0) &&
+                    (!last_arch     || cmp(last_arch,     arch)     == 0)) {
+                    bool use_command = cmp(first, ">") == 0;
+                    if (use_command || cmp(first, "!") == 0) {
+                        // combine tokens into singular string
+                        string cmd = string(alloc, 64);
+                        each(l->text, string, w) {
+                            if (first == w) continue;
+                            if (len(cmd))
+                                append(cmd, " ");
+                            concat(cmd, w);
+                        }
+                        push(use_command ? im->commands : im->always, cmd);
+                    } else {
+                        each(l->text, string, w) {
+                            /// if its VAR=VAL then this is not 'config' but rather environment
+                            char f = w->chars[0];
+                            cstr e = strstr(w->chars, "=");
+                            if (isalpha(f) && (f >= 'A' && f <= 'Z') && e) {
+                                char name[128];
+                                sz   ln = (sz)(e - w->chars);
+                                verify(ln < 128, "invalid data");
+                                memcpy(name, w->chars, ln);
+                                name[ln] = 0;
+                                char value[128];
+                                sz value_ln = len(w) - ln - 1;
+                                memcpy(value, &w->chars[ln + 1], value_ln);
+                                string n   = trim(string(name));
+                                string val = evaluate(string(value), environment);
+                                set(im->environment, n, val);
+                            } else {
+                                string e = evaluate(w, environment);
+                                push(im->config, e);
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
     if (!parent) {
         /// this will perform actual import (now that the data is set)
@@ -403,9 +420,21 @@ bool import_make(import im) {
         } else if (!file_exists("Makefile")) {
             cd(im->import_path);
             /// build for automake projects
-            if (file_exists("./configure.ac") || file_exists("./configure") || file_exists("./config")) {
+            if (file_exists("./autogen.sh")  || 
+                file_exists("./configure.ac") || 
+                file_exists("./configure")    ||
+                file_exists("./config")) {
+                
+                // this is not libffi at all, its a race condition that it and many others have with autotools
+                if (!file_exists("./ltmain.sh"))
+                    verify(exec("libtoolize --install --copy --force") == 0, "libtoolize");
+                
+                // neither this -- but its a common preference on these repos
+                if (file_exists("./autogen.sh")) {
+                    verify(exec("bash ./autogen.sh") == 0, "autogen");
+                }
                 /// generate configuration scripts if available
-                if (!file_exists("./configure") && file_exists("./configure.ac")) {
+                else if (!file_exists("./configure") && file_exists("./configure.ac")) {
                     verify(exec("autoupdate .")    == 0, "autoupdate");
                     verify(exec("pwd") == 0, "autoreconf");
                     verify(exec("autoreconf -i .") == 0, "autoreconf");
@@ -526,7 +555,7 @@ none cflags_libs(tapestry a, string* cflags, string* libs) {
                 concat(*cflags, cast(string, fl));
                 append(*cflags, " ");
             } else if (fl->is_lib) {
-                concat(*libs, form(string, "-l%o", fl->name));
+                concat(*libs, form(string, "%o", fl->name));
                 append(*libs, " ");
             }
         }
@@ -538,7 +567,7 @@ none cflags_libs(tapestry a, string* cflags, string* libs) {
                     concat(*cflags, cast(string, fl));
                     append(*cflags, " ");
                 } else if (fl->is_lib) {
-                    concat(*libs, form(string, "-l%o", fl->name));
+                    concat(*libs, form(string, "%o", fl->name));
                     append(*libs, " ");
                 }
             }
@@ -603,7 +632,8 @@ none tapestry_link_shares(tapestry a, path project_from) {
 // build with optional bc path; if no bc path we use the project file system
 i32 tapestry_build(tapestry a, path bc) {
     int  error_code = 0;
-    bool debug = is_dbg(a, (cstr)a->name->chars, false);
+    bool debug = is_dbg(a, a->dbg, (cstr)a->name->chars, false);
+    bool sanitize = debug && is_dbg(a, a->sanitize, (cstr)a->name->chars, false); // sanitize does not work with musl, and perhaps we need a special linking area for sanitize; bit lame!
 
     if (bc) {
         // simplified process for .bc case
@@ -624,6 +654,7 @@ i32 tapestry_build(tapestry a, path bc) {
     make_dir(a->build_path);
 
     path   project_lib  = form  (path, "%o/lib",  a->project_path);
+    path   project_app  = form  (path, "%o/app",  a->project_path);
     path   build_lib    = form  (path, "%o/lib",  a->build_path);
     path   build_app    = form  (path, "%o/app",  a->build_path);
     path   build_test   = form  (path, "%o/test", a->build_path);
@@ -639,6 +670,7 @@ i32 tapestry_build(tapestry a, path bc) {
     a->lib_targets      = array();
     a->app_targets      = array();
     bool has_lib        = dir_exists("%o", project_lib);
+    path project_main   = has_lib ? project_lib : project_app;
 
     struct dir {
         cstr  dir;
@@ -716,8 +748,8 @@ i32 tapestry_build(tapestry a, path bc) {
         for (int l = 0; l < 2; l++) {
             struct lang* lang = &langs[l];
             if (!lang->std) continue;
-            string compiler = form(string, "%s -c %s-std=%s %s %o %o -I%o -I%o -I%o -I%o",
-                lang->compiler, debug ? "-g2 -fsanitize=address " : "", lang->std,
+            string compiler = form(string, "%s -c %s%s-std=%s %s %o %o -I%o -I%o -I%o -I%o",
+                lang->compiler, debug ? "-g2 " : "", sanitize ? "-fsanitize=address " : "", lang->std,
                 l == 0 ? CFLAGS : CFLAGS, /// CFLAGS from env come first
                 base_cflags,
                 l == 0 ? cflags : cflags, /// ... then project-based flags
@@ -751,7 +783,7 @@ i32 tapestry_build(tapestry a, path bc) {
         string lflags = string(alloc, 64);
         //concat(lflags, form(string, "-L%o/lib ", a->build_path));
         concat(lflags, form(string, "-L%o/lib -Wl,-rpath,%o/lib%s", a->install, a->install,
-            debug ? " -fsanitize=address " : ""));
+            sanitize ? " -fsanitize=address " : ""));
 
         if (is_lib) {
             path output_lib = form(path, "%o/lib/%s%o%s", a->build_path, lib_pre, n2, lib_ext);
@@ -798,10 +830,47 @@ i32 tapestry_build(tapestry a, path bc) {
             // run test here, to verify prior to install; will need updated PATH so they may run the apps we built just prior to test
         }
     }
+
+    // Check if we have headers to process
+    if (dir_exists("%o", project_lib)) {
+        // Generate Silver format from concatenated headers
+        path silver_output = form(path, "%o/include/%o.sf", a->install, name);
+        path main_header = form(path, "%o/%o", project_lib, name);
+        
+        // Check if we need to regenerate (if any header is newer than .sf file)
+        i64 silver_time = modified_time(silver_output);
+        i64 latest_header_time = 0;
+        
+        // Check main header
+        if (file_exists("%o", main_header)) {
+            latest_header_time = max(latest_header_time, modified_time(main_header));
+        }
+        
+        // Check all .h files
+        array h_files = ls(project_lib, string(".h"), false);
+        each(h_files, path, h_file) {
+            latest_header_time = max(latest_header_time, modified_time(h_file));
+        }
+        
+        // Regenerate if needed
+        if (latest_header_time > silver_time || !file_exists("%o", silver_output)) {
+            //print("%22o: generating silver format", name);
+            //int convert_result = exec("python3 %o/c-silver.py --concat %o %o %o",
+            //    a->install, project_lib, name, silver_output);
+            //verify(convert_result == 0, "Silver format generation failed");
+        }
+        
+        drop(h_files);
+    }
+
+
+
     
     // for each import with a share folder in its repo, symlink all files individually (cannot use folders safely because our targets stack resources)
-    each (a->imports, import, im)
-        tapestry_link_shares(a, im->import_path);
+    each (a->imports, import, im) {
+        if (!eq(im->name, "tapestry"))
+            tapestry_link_shares(a, im->import_path);
+    }
 
     tapestry_link_shares(a, a->project_path);
 
